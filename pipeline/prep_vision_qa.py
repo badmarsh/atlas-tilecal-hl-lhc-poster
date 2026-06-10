@@ -20,6 +20,7 @@ import sys
 
 try:
     import fitz  # PyMuPDF
+    import PIL.Image
 except ImportError:
     sys.exit("ERROR: PyMuPDF (fitz) is not installed.\n"
              "       This extraction-QA tool needs it: pip install -r requirements.txt\n"
@@ -103,6 +104,12 @@ def process_output_dir(out_dir, cwd, scratch_dir, dpi):
                     scratch_asset_path = os.path.splitext(scratch_asset_path)[0] + ".png"
                     render_pdf_first_page(asset_path, dpi).save(scratch_asset_path)
                 elif ext in (".png", ".jpeg", ".jpg"):
+                    try:
+                        PIL.Image.open(asset_path).verify()  # reject corrupt images
+                    except Exception as e:
+                        print(f"    [WARN] asset corrupt {asset_path}: {e}")
+                        asset_pngs.append(f"ERROR: {asset}")
+                        continue
                     shutil.copy2(asset_path, scratch_asset_path)
                 else:
                     asset_pngs.append(f"UNSUPPORTED: {asset}")

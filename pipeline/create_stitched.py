@@ -47,7 +47,11 @@ def stitch_slide(slide, font):
     for i, asset in enumerate(assets):
         if not isinstance(asset, str) or not os.path.exists(asset):
             continue
+
         try:
+            # verify() must run on a fresh, unloaded handle; it leaves the image
+            # unusable, so reopen for the actual decode.
+            PIL.Image.open(asset).verify()
             a_img = PIL.Image.open(asset).convert("RGB")
         except Exception:
             continue

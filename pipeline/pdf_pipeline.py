@@ -4,6 +4,10 @@ import shutil
 import unicodedata
 import fitz  # PyMuPDF
 import re
+import logging
+
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
 
 # --- Significance filter ----------------------------------------------------
 # Keep only real figures / graphs / tables. Drop icons, logos, crests, author
@@ -175,12 +179,11 @@ def process_pdf(pdf_path):
     result = {"name": pdf_name, "pages": 0, "assets": 0, "mapped": 0,
               "missing": 0, "stray": 0, "balanced": True, "error": None}
 
-    print(f"\nProcessing {pdf_name}...")
-
+    logger.info(f"\nProcessing {pdf_name}...")
     try:
         doc = fitz.open(pdf_path)
     except Exception as e:
-        print(f"  [ERROR] Failed to open {pdf_path}: {e}")
+        logger.error(f"  [ERROR] Failed to open {pdf_path}: {e}")
         result["error"] = f"open failed: {e}"
         return result
 
@@ -199,7 +202,7 @@ def process_pdf(pdf_path):
 
             # Phase 1, 2, 3
             for page_num in range(len(doc)):
-                print(f"  Page {page_num + 1}/{len(doc)}")
+                logger.info(f"  Page {page_num + 1}/{len(doc)}")
                 page = doc[page_num]
 
                 # Phase 1: Pagination
@@ -309,14 +312,14 @@ def process_pdf(pdf_path):
                                 except (ValueError, RuntimeError) as e:
                                     # Fallback: rasterize the region to PNG (always renders,
                                     # even when set_cropbox rejects the box).
-                                    print(f"      [INFO] PDF crop failed ({e}); rasterizing region instead.")
+                                    logger.info(f"      [INFO] PDF crop failed ({e}); rasterizing region instead.")
                                     try:
                                         z = RASTER_FALLBACK_DPI / 72.0
                                         pix = doc[page_num].get_pixmap(matrix=fitz.Matrix(z, z), clip=clip)
                                         pix.save(vec_path[:-4] + ".png")
                                         asset_count += 1
                                     except Exception as e2:
-                                        print(f"      [WARNING] Raster fallback also failed: {e2}")
+                                        logger.warning(f"      [WARNING] Raster fallback also failed: {e2}")
                         finally:
                             crop_doc.close()
 
@@ -332,7 +335,7 @@ def process_pdf(pdf_path):
     result["assets"] = asset_count
 
     # Phase 4: LaTeX Mapping
-    print("  Mapping placeholders...")
+    logger.info("  Mapping placeholders...")
     with open(tex_path_raw, 'r', encoding='utf-8') as f:
         tex_content = f.read()
 
@@ -362,7 +365,7 @@ def process_pdf(pdf_path):
     result["mapped"] = len(asset_map)
 
     # Phase 5: Verification Pass 1 (Sanity Check)
-    print("  Verification Pass 1...")
+    logger.info("  Verification Pass 1...")
     missing_files = []
     # Pull every path referenced by \includegraphics{...} or \input{...}
     refs = re.findall(r"\\(?:includegraphics(?:\[[^\]]*\])?|input)\{([^}]+)\}", mapped_tex_content)
@@ -373,8 +376,8 @@ def process_pdf(pdf_path):
             missing_files.append(ref)
 
     if missing_files:
-        print("    [WARNING] Missing or unmapped files:", set(missing_files))
-        print("    [INFO] Attempting to fix dynamically by removing unmapped figure blocks...")
+        logger.warning(f"    [WARNING] Missing or unmapped files: {set(missing_files)}")
+        logger.info("    [INFO] Attempting to fix dynamically by removing unmapped figure blocks...")
 
         for placeholder in set(missing_files):
             if placeholder.startswith("PLACEHOLDER_"):
@@ -391,36 +394,36 @@ def process_pdf(pdf_path):
         with open(mapped_tex_path, 'w', encoding='utf-8') as f:
             f.write(mapped_tex_content)
     else:
-        print("    [OK] All referenced files exist in assets/")
+        logger.info("    [OK] All referenced files exist in assets/")
     result["missing"] = len(set(missing_files))
 
     # Phase 6: Verification Pass 2 (Compilation Check)
-    print("  Verification Pass 2...")
+    logger.info("  Verification Pass 2...")
     stray_placeholders = re.findall(r"PLACEHOLDER_SLIDE_\d+_ITEM_\d+", mapped_tex_content)
     if stray_placeholders:
-        print("    [ERROR] Stray placeholders found:", set(stray_placeholders))
+        logger.error(f"    [ERROR] Stray placeholders found: {set(stray_placeholders)}")
     else:
-        print("    [OK] No stray placeholders.")
+        logger.info("    [OK] No stray placeholders.")
     result["stray"] = len(set(stray_placeholders))
 
     # Check syntax (basic figure matching)
     begin_figs = mapped_tex_content.count(r"\begin{figure}")
     end_figs = mapped_tex_content.count(r"\end{figure}")
     if begin_figs != end_figs:
-        print(f"    [ERROR] Unmatched figure environments: {begin_figs} begins vs {end_figs} ends.")
+        logger.error(f"    [ERROR] Unmatched figure environments: {begin_figs} begins vs {end_figs} ends.")
         result["balanced"] = False
     else:
-        print("    [OK] LaTeX figure structure visually sound.")
+        logger.info("    [OK] LaTeX figure structure visually sound.")
 
     if text_stats.get('stripped'):
-        print(f"    [INFO] Dropped {text_stats['stripped']} unrepresentable Unicode char(s) from text.")
+        logger.info(f"    [INFO] Dropped {text_stats['stripped']} unrepresentable Unicode char(s) from text.")
     result["stripped"] = text_stats.get('stripped', 0)
 
     # Remove the raw intermediate .tex now that the mapped file is final.
     if os.path.exists(tex_path_raw):
         os.remove(tex_path_raw)
 
-    print(f"  Done. Mapped file saved to {mapped_tex_path}")
+    logger.info(f"  Done. Mapped file saved to {mapped_tex_path}")
     return result
 
 def main():
@@ -432,26 +435,25 @@ def main():
     pdfs = [p for p in pdfs if "Output_" not in p]
 
     if not pdfs:
-        print("No PDFs found in the root directory.")
+        logger.info("No PDFs found in the root directory.")
         return
 
-    print(f"Found {len(pdfs)} PDFs to process.")
-
+    logger.info(f"Found {len(pdfs)} PDFs to process.")
     results = []
     for pdf in pdfs:
         try:
             results.append(process_pdf(pdf))
         except Exception as e:
             # Isolate failures: one bad PDF must not abort the whole batch.
-            print(f"  [ERROR] Unhandled failure on {pdf}: {e}")
+            logger.error(f"  [ERROR] Unhandled failure on {pdf}: {e}")
             results.append({"name": os.path.basename(pdf), "pages": 0, "assets": 0,
                             "mapped": 0, "missing": 0, "stray": 0,
                             "balanced": False, "error": str(e)})
 
     # Final summary report: succeeded vs. persistent errors
-    print("\n" + "=" * 64)
-    print("BATCH SUMMARY")
-    print("=" * 64)
+    logger.info("\n" + "=" * 64)
+    logger.info("BATCH SUMMARY")
+    logger.info("=" * 64)
     ok = [r for r in results if not r["error"] and r["stray"] == 0 and r["balanced"]]
     bad = [r for r in results if r not in ok]
     for r in results:
@@ -460,11 +462,12 @@ def main():
                 f"{r['mapped']} mapped, {r['missing']} missing, {r['stray']} stray")
         if r["error"]:
             line += f"  | error: {r['error']}"
-        print(line)
-    print("-" * 64)
-    print(f"  Succeeded: {len(ok)}/{len(results)}    Failed: {len(bad)}/{len(results)}")
+        logger.info(line)
+    logger.info("-" * 64)
+    logger.info(f"  Succeeded: {len(ok)}/{len(results)}    Failed: {len(bad)}/{len(results)}")
     if bad:
-        print("  Persistent errors in:", ", ".join(r["name"] for r in bad))
+        logger.info(f"  Persistent errors in: {', '.join(r['name'] for r in bad)}")
+
 
 if __name__ == "__main__":
     main()

@@ -5,6 +5,10 @@ import re
 import time
 import io
 import sys
+import logging
+
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
 from pathlib import Path
 from typing import List, Optional
 
@@ -188,7 +192,7 @@ def verify_slide(client: genai.Client, system_instruction: str, base_name: str, 
                 asset_img = rasterize_asset(asset_path)
                 contents.append(asset_img)
             except Exception as e:
-                print(f"    Warning: Could not load asset {asset_path}: {e}")
+                logger.warning(f"    Warning: Could not load asset {asset_path}: {e}")
                 
     user_prompt_text += "\nTEX_SECTION:\n<<<\n"
     user_prompt_text += slide_tex
@@ -224,13 +228,13 @@ def verify_slide(client: genai.Client, system_instruction: str, base_name: str, 
             time.sleep(wait)
 
     if response is None or not getattr(response, "text", None):
-        print(f"Empty response for slide {slide_num}.")
+        logger.info(f"Empty response for slide {slide_num}.")
         return None
 
     try:
         return json.loads(response.text)
     except json.JSONDecodeError:
-        print(f"Failed to parse JSON response for slide {slide_num}:\n{response.text}")
+        logger.info(f"Failed to parse JSON response for slide {slide_num}:\n{response.text}")
         return None
 
 def process_pdf(client: genai.Client, system_prompt: str, output_dir: str):
@@ -238,32 +242,30 @@ def process_pdf(client: genai.Client, system_prompt: str, output_dir: str):
     mapped_tex_path = os.path.join(output_dir, f"{base_name}_mapped.tex")
     
     if not os.path.exists(mapped_tex_path):
-        print(f"Skipping {output_dir}: no {base_name}_mapped.tex found.")
+        logger.info(f"Skipping {output_dir}: no {base_name}_mapped.tex found.")
         return
         
-    print(f"Processing PDF: {base_name}")
+    logger.info(f"Processing PDF: {base_name}")
     with open(mapped_tex_path, "r", encoding="utf-8") as f:
         tex_content = f.read()
         
     slides = split_tex_into_slides(tex_content)
     total_slides = len(slides)
-    print(f"  Found {total_slides} slides.")
-    
+    logger.info(f"  Found {total_slides} slides.")
     results = []
     
     for slide in slides:
         slide_num = slide["slide_num"]
-        print(f"  Verifying Slide {slide_num}/{total_slides}...")
-        
+        logger.info(f"  Verifying Slide {slide_num}/{total_slides}...")
         slide_img_path = os.path.join(output_dir, "slides", f"slide_{slide_num:02d}.pdf")
         if not os.path.exists(slide_img_path):
-            print(f"    Warning: Missing slide ground truth at {slide_img_path}")
+            logger.warning(f"    Warning: Missing slide ground truth at {slide_img_path}")
             continue
             
         try:
             slide_image = render_pdf_to_png(slide_img_path)
         except Exception as e:
-            print(f"    Warning: Failed to render {slide_img_path}: {e}")
+            logger.warning(f"    Warning: Failed to render {slide_img_path}: {e}")
             continue
             
         # Extract assets
@@ -274,8 +276,7 @@ def process_pdf(client: genai.Client, system_prompt: str, output_dir: str):
         result_json = verify_slide(client, system_prompt, base_name, slide_num, total_slides, slide["tex"], slide_image, asset_paths)
         if result_json:
             results.append(result_json)
-            print(f"    Verdict: {result_json.get('verdict', 'unknown')} (Confidence: {result_json.get('confidence', 0.0)})")
-            
+            logger.info(f"    Verdict: {result_json.get('verdict', 'unknown')} (Confidence: {result_json.get('confidence', 0.0)})")
     # Aggregate
     slides_total = len(results)
     if slides_total == 0:
@@ -336,25 +337,24 @@ def process_pdf(client: genai.Client, system_prompt: str, output_dir: str):
     with open(out_file, "w", encoding="utf-8") as f:
         json.dump(aggregation, f, indent=2)
         
-    print(f"  => Finished {base_name}. Overall: {overall}. Report written to {out_file}\n")
-
+    logger.info(f"  => Finished {base_name}. Overall: {overall}. Report written to {out_file}\n")
 def main():
     try:
         client = genai.Client()
     except Exception as e:
-        print(f"Error initializing Google GenAI Client: {e}")
-        print("Make sure GOOGLE_API_KEY is set in your environment.")
+        logger.info(f"Error initializing Google GenAI Client: {e}")
+        logger.info("Make sure GOOGLE_API_KEY is set in your environment.")
         return
         
     try:
         system_prompt = extract_system_prompt()
     except Exception as e:
-        print(f"Error loading system prompt: {e}")
+        logger.info(f"Error loading system prompt: {e}")
         return
 
     output_dirs = glob.glob("Output_*")
     if not output_dirs:
-        print("No Output_* directories found.")
+        logger.info("No Output_* directories found.")
         return
         
     for d in output_dirs:

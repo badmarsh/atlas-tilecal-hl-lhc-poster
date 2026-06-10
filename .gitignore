@@ -38,3 +38,7 @@ poster_payload*.zip
 build/drafts/*.pdf
 build/drafts/_prev/
 build/drafts/poster_*_*.tex
+
+# Convenience symlinks so draft builds resolve assets/ and logos/ from build/drafts/
+build/drafts/assets
+build/drafts/logos
