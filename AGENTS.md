@@ -7,6 +7,36 @@
 
 ---
 
+## 0. Agent bootstrap (run this first)
+
+If you are a coding agent starting a session in this repo for the first time,
+run the setup script before anything else:
+
+```bash
+bash setup.sh
+```
+
+It detects macOS (Homebrew) or Debian/Ubuntu (apt), installs `texlive`,
+`poppler`, `imagemagick`, and `Pillow`, then runs a build to confirm the
+environment is working. If it exits with `RESULT: PASS` you are ready. If it
+fails, check the error and consult §1 of the README for manual steps.
+
+**Prompt you can paste into a new agent session to bootstrap it:**
+
+```
+You are working on the ATLAS TileCal HL-LHC irradiation poster repo.
+
+Before making any changes:
+1. Read AGENTS.md in full.
+2. Run `bash setup.sh` from the repo root to install dependencies and verify
+   the build. Wait for it to print "RESULT: PASS" before proceeding.
+3. Every edit to build/irradiation_poster.tex must be followed by
+   `cd build && ./build.sh`. The change is not done until check_fit.py
+   prints "RESULT: PASS".
+```
+
+---
+
 ## 1. What this repo is
 
 An A0 **portrait** LaTeX poster built with the `tikzposter` class:
