@@ -42,8 +42,10 @@ case "$OS" in
 esac
 
 echo
-echo ":: installing Python dependencies (Pillow, numpy)"
-python3 -m pip install --quiet --user Pillow numpy
+echo ":: installing Python dependencies (Pillow, numpy) into build/venv"
+VENV="$(dirname "$0")/build/venv"
+python3 -m venv "$VENV"
+"$VENV/bin/pip" install --quiet Pillow numpy
 
 echo
 echo ":: verifying build"

@@ -82,6 +82,39 @@
 \usecolorstyle{atlascolors}
 \newcommand\semihuge{\@setfontsize\semihuge{18.93}{23.45}}
 
+% ===========================================================================
+%  LAYOUT PARAMETERS — find and adjust all style knobs here.
+% ===========================================================================
+%
+%  1. Inter-card vertical gap: blockverticalspace in \documentclass (line 43).
+%     Current value: 4em — increase for more breathing room.
+%
+%  2. Body text font size: controlled by \looseitems / \tightitems below.
+%     Currently: \small.  Options: \normalsize | \small | \footnotesize
+%
+%  3. Caption font size & leading: controlled by \captiontext below.
+%     Currently: \footnotesize, baselinestretch=0.88 (12% tighter leading).
+%
+%  4. List item spacing:
+%     col1/col3 (loose):  itemsep=0.3em — edit \looseitems below
+%     col2 (tight):       itemsep=0.15em — edit \tightitems below
+%
+%  5. Minimum figure width: 0.90\linewidth (design rule — do not go below).
+%
+% ---------------------------------------------------------------------------
+%  Body text — \small  (same size as References card).
+%  Use \looseitems in col1/col3, \tightitems in col2 (col2 overflows first).
+% ---------------------------------------------------------------------------
+\newcommand{\looseitems}{\small\begin{itemize}\setlength{\itemsep}{0.3em}}
+\newcommand{\tightitems}{\small\begin{itemize}\setlength{\itemsep}{0.15em}}
+
+% ---------------------------------------------------------------------------
+%  Caption style — \footnotesize + 12\% tighter leading.
+%  Wrap all figure/table/graph captions in \captiontext{...}.
+% ---------------------------------------------------------------------------
+\newcommand{\captiontext}[1]{%
+    {\footnotesize\renewcommand{\baselinestretch}{0.88}\selectfont#1}}
+
 \definetitlestyle{sampletitle}{width=600mm, roundedcorners=20, linewidth=2pt, innersep=5pt,
 titletotopverticalspace=15mm, titletoblockverticalspace=20mm}{\begin{scope}[line width=\titlelinewidth, rounded corners=\titleroundedcorners] \draw[color=blocktitlebgcolor, fill=titlebgcolor](\titleposleft,\titleposbottom) rectangle (\titleposright,\titlepostop);
 \end{scope}}
@@ -117,7 +150,7 @@ titletotopverticalspace=15mm, titletoblockverticalspace=20mm}{\begin{scope}[line
 \begin{columns}
     \column{0.333333}
     \block{Tile Calorimeter}{
-        \begin{itemize}\setlength{\itemsep}{0.5em}
+        \looseitems
             \item Central hadronic calorimeter of the ATLAS detector covering $|\eta| < 1.7$
             \item Identification and energy measurements of hadrons, jets, tau leptons decaying hadronically and missing transverse energy, 
             \\resolution of $\sigma_\mathrm{E} / E = 56.4\%/\sqrt{E\mathrm{(GeV)}}\oplus5.5\%$
@@ -131,7 +164,7 @@ titletotopverticalspace=15mm, titletoblockverticalspace=20mm}{\begin{scope}[line
             \includegraphics[width=0.64\linewidth]{plots/plot1.pdf}
             \includegraphics[width=0.34\linewidth]{plots/plot2.pdf}
         \end{center}
-        \begin{itemize}\setlength{\itemsep}{0.5em}
+        \looseitems
             \item Light produced by particles passing through scintillating tiles transmitted to photomultipliers (PMTs) via the Wavelength-shifting fibres
             \item Radial direction: readout cells divided into 3 layers in LB (A, BC, and D) and 3 layers in EB (A, B, and D)
             \item Azimuthal direction: 64 modules in each barrel
@@ -146,7 +179,7 @@ titletotopverticalspace=15mm, titletoblockverticalspace=20mm}{\begin{scope}[line
     }
     
 %\block{Signal Reconstruction}{
-%        \begin{itemize}\setlength{\itemsep}{0.5em}
+%        \looseitems
 %            \item PMT signal shaped and digitized in the front-end readout electronics
 %            \item Signals divided into two branches: low gain (LG) and high gain (HG) and amplified with a relative ratio of 1:64
 %            \item Signal pulse sampled every 25 ns using a 10-bit ADC 
@@ -172,7 +205,7 @@ titletotopverticalspace=15mm, titletoblockverticalspace=20mm}{\begin{scope}[line
         Various calibration systems to calibrate each step of the TileCal cell energy reconstruction:
         \vspace{0.2cm}
         
-        \begin{itemize}\setlength{\itemsep}{0.5em}
+        \looseitems
             \item \textbf{\textcolor{cesium}{Cesium System}} - performed on a monthly basis
             \begin{itemize}
                 \item $^{137}$Cs capsule hydraulically driven through all tiles
@@ -210,7 +243,7 @@ titletotopverticalspace=15mm, titletoblockverticalspace=20mm}{\begin{scope}[line
     \column{0.333333}
     
     \block{Cesium System}{
-        \begin{itemize}\setlength{\itemsep}{0.5em}
+        \looseitems
             \item Hydraulic system moves $^{137}$Cs capsule (radioactive $\gamma$-source with $E_{\gamma} = 0.662$ MeV) through the calorimeter system measuring the response of every single tile
             \item Signals readout by a dedicated integrator system
             \item For typical cells the precision $\sim 0.3\%$
@@ -226,7 +259,7 @@ titletotopverticalspace=15mm, titletoblockverticalspace=20mm}{\begin{scope}[line
     }
     
     \block{Laser System}{
-        \begin{itemize}\setlength{\itemsep}{0.5em}
+        \looseitems
             \item Single laser source: short 10 ns light pulses with \\$\lambda=$ 532 nm simultaneously distributed to all PMTs
             \item Precision of the laser calibration at the level of $\sim0.5\%$
             \item Better stability in time observed for the demonstrator module
@@ -239,7 +272,7 @@ titletotopverticalspace=15mm, titletoblockverticalspace=20mm}{\begin{scope}[line
     }
     
     \block{Charge Injection System}{
-            \begin{itemize}
+            \looseitems
                 \item Injects a well-defined charge signal to the readout electronics covering the full dynamic range
                 \item Determines $\textcolor{cis}{C_{\text{ADC}\rightarrow\text{pC}}}$ conversion constant from sample amplitude (ADC counts) to charge units (pC)
                 \item Precision of the CIS calibration at the level of $\sim0.7\%$
@@ -254,7 +287,7 @@ titletotopverticalspace=15mm, titletoblockverticalspace=20mm}{\begin{scope}[line
             
     
     \block{Minimum Bias System}{
-            \begin{itemize}
+            \looseitems
                 \item Inelastic $pp$ collisions with low momentum transfer
                 \item Minimum bias events produce a PMT current proportional to the LHC luminosity
                 \item Signal readout by the same integrator system as used by Cesium calibration
@@ -272,7 +305,7 @@ titletotopverticalspace=15mm, titletoblockverticalspace=20mm}{\begin{scope}[line
 \column{0.333333}    
     
 \block{Demonstrator Module}{
-            \begin{itemize}
+            \looseitems
                 \item Fully inserted in TileCal Module LBA14 at the end of July 2019
                 \item Full Long Barrel super-drawer with new electronics and analog trigger, operating with backward compatibility with the current ATLAS DAQ
                 %\item Operating with backward compatibility with the current ATLAS DAQ
@@ -289,7 +322,7 @@ titletotopverticalspace=15mm, titletoblockverticalspace=20mm}{\begin{scope}[line
     }
     
 \block{Isolated Muons - Energy Response}{
-            \begin{itemize}
+            \looseitems
                 \item Isolated muons produced in $W \rightarrow \mu\nu$ decays from $pp$ collisions used for calorimeter performance tests
                % \item Uniformity and stability of the cells' response and the EM scale setting checks
                % \item Energy loss per unit path close to the minimum ionizing level $\rightarrow$ muon is an ideal particle to scan the entire TileCal volume
@@ -320,7 +353,7 @@ titletotopverticalspace=15mm, titletoblockverticalspace=20mm}{\begin{scope}[line
     }    
     
     \block{Time Performance}{
-            \begin{itemize}
+            \looseitems
                 \item Using reconstructed jets with $p_\mathrm{T}>$ 20 GeV
                 \item Mean cell time decreases with cell energy due to less neutrons and slow hadronic components of shower 
                 \item Transition between high and low gain at $\sim 22$ GeV

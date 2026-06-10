@@ -259,25 +259,52 @@ Title:       <POSTER TITLE>
 Author:      <NAME>, on behalf of the ATLAS Tile Calorimeter System
 Institution: <INSTITUTION>
 
-## Source material
+## Step 1 — Study the sources and assets FIRST (do not skip)
 
-Read these files for factual content. Every number, component name, dose
-value, and test result must come from these sources — do not invent physics:
+Before writing a single line of LaTeX, read and analyse all relevant source
+material to understand what content and figures are available:
 
-  sources/converted/Output_ATL-TILECAL-SLIDE-2025-552/ATL-TILECAL-SLIDE-2025-552_mapped.tex
-  sources/converted/Output_paper_Valdes_Santurio_2023_J._Inst._18_C04011/paper_Valdes_Santurio_2023_J._Inst._18_C04011_mapped.tex
-  sources/converted/Output_paper_ATL-TILECAL-PROC-2022-017/paper_ATL-TILECAL-PROC-2022-017_mapped.tex
+1. Read all source tex files listed below. Extract concrete facts: numbers,
+   component names, dose values, test results, efficiencies, fluences.
+2. List every figure file present in `build/assets/` and note its aspect
+   ratio (px width × height). Figures are the visual anchor of each card —
+   plan which figure belongs to which card before writing.
+3. Map content to the 3×3 grid (9 cards total). Aim for every card to be
+   approximately equally full — no card should be sparse while another
+   overflows.
 
-(Add or remove source files to match your topic.)
+Source files (read all that are relevant to the poster topic):
+  sources\converted\Output_Eduardo_IEEE_NSS_MIC_RTSD_Poster-2\Eduardo_IEEE_NSS_MIC_RTSD_Poster-2_mapped.tex
+  sources\converted\Output_ATL-TILECAL-SLIDE-2025-552\ATL-TILECAL-SLIDE-2025-552_mapped.tex
 
-## Layout — 3 equal columns
+The rest of the files are more information for your context.  Read all files to know the problematics. 
+sources\converted\Output_Eduardo_IEEE_NSS_MIC_RTSD2025_Summary\Eduardo_IEEE_NSS_MIC_RTSD2025_Summary_mapped.tex  sources/converted/Output_paper_Valdes_Santurio_2023_J._Inst._18_C04011/paper_Valdes_Santurio_2023_J._Inst._18_C04011_mapped.tex
+sources\converted\Output_paper_ATL-TILECAL-PROC-2022-017\paper_ATL-TILECAL-PROC-2022-017_mapped.tex
+sources\converted\Output_paper_Valdes_Santurio_2023_J._Inst._18_C04011\paper_Valdes_Santurio_2023_J._Inst._18_C04011_mapped.tex
+
+## Step 2 — Respect user-specified card content
+
+If the user has specified a topic, section title, or content for one or more
+cards, those specifications take priority and must be implemented exactly as
+requested. Cards not specified by the user are filled by the agent using the
+best content selected from the source material in Step 1.
+
+User card specifications (fill in or leave blank):
+  Card <column>/<row>: <user specification, or "agent choice">
+  ...
+
+## Step 3 — Write the poster
+
+Target layout: **3 columns × 3 rows = 9 cards**. Every card must be filled
+with real, substantive content. The poster must feel uniformly dense — no
+large blank areas inside cards or columns that end far above the page bottom.
 
 Column 1 (left) — has the most vertical slack, put longer blocks here:
   - Block: "<SECTION A>" — <what this block covers>
   - Block: "<SECTION B>" — <what this block covers>
   - Block: References
 
-Column 2 (middle) — overflows first; use \tightitems, keep figures ≤0.60\linewidth:
+Column 2 (middle) — overflows first; use \tightitems, keep figures ≥0.90\linewidth:
   - Block: "<SECTION C>"
   - Block: "<SECTION D>"
   - Block: "<SECTION E>"
@@ -287,20 +314,37 @@ Column 3 (right):
   - Block: "<SECTION G>"
   - Block: Conclusions & Outlook
 
+## Language rules (non-negotiable)
+
+- **Scientific register throughout.** The audience is physicists. Write as you
+  would in a conference proceedings paper: concise, precise, terminology-dense.
+- **No layman explanations.** Do not define what a calorimeter, PMT, ADC, or
+  FPGA is. Do not use phrases like "in simple terms", "basically", or
+  "this means that". Every sentence must add physical or technical information.
+- State results with units and uncertainties where known.
+  Use thin spaces: `40\,MHz`, `108\,Gy`, `13\times10^{12}\,n_\text{eq}/cm^2`.
+
 ## Style rules (non-negotiable)
 
 - Copy the preamble from build/new_poster.tex — do not invent a new one.
 - Use \looseitems for col1/col3 bullets, \tightitems for col2 bullets.
 - Radiation-effect terms: \textcolor{tid}{TID}, \textcolor{niel}{NIEL},
   \textcolor{see}{SEE}, \textcolor{sel}{SEL}.
-- Units use thin spaces: 40\,MHz  108\,Gy  10^{12}\,n/cm^2.
+- Figures: minimum width 0.90\linewidth. Use \captiontext{...} for all captions.
 - Only reference figures that physically exist in build/assets/.
 
 ## Completion criteria — do NOT stop until ALL of these are true
 
 1. `cd build && ./build.sh <FILENAME>.tex` prints `RESULT: PASS`.
-2. Every block contains real content from the source files above.
-   Placeholder text ("TBD", "insert here", "lorem ipsum", single-word
-   bullets) is a failure condition, not a draft.
-3. At least two figures from build/assets/ are used with captions.
+2. All 9 cards contain real content from the source files. Placeholder text
+   ("TBD", "insert here", "lorem ipsum", single-word bullets) is a failure
+   condition, not a draft.
+3. Every card that has a matching figure in build/assets/ uses it with a
+   \captiontext{} caption.
+4. No card is visibly sparse — if a column ends more than ~25% above the page
+   bottom, add content or increase blockverticalspace until the poster fills.
+5. The poster reads as a self-contained scientific summary. A physicist
+   unfamiliar with this specific work can learn the key results from the poster
+   alone, without referring to the papers.
 ```
+

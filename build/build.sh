@@ -44,4 +44,14 @@ fi
 
 echo
 echo ":: fit check"
-python3 check_fit.py "${PREVDIR}/${BASE}-1.png"
+# Prefer the venv (created by setup.sh) so Pillow/numpy are available even on
+# externally-managed-environment Ubuntu/Debian systems.
+VENV="$HERE/venv"
+if [ -x "$VENV/bin/python3" ]; then
+    PY="$VENV/bin/python3"
+elif [ -x "$VENV/bin/python" ]; then
+    PY="$VENV/bin/python"
+else
+    PY="python3"
+fi
+"$PY" check_fit.py "${PREVDIR}/${BASE}-1.png"
