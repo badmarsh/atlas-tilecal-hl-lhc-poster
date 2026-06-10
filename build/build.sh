@@ -11,7 +11,7 @@
 #      at an OLD preview. Removing it up front prevents that trap.
 #   2. Compiles twice (tikzposter + references need two passes).
 #   3. Renders a fixed-size PNG preview and runs check_fit.py.
-set -euo pipefail
+set -eu
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$HERE"

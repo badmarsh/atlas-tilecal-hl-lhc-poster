@@ -46,6 +46,23 @@ sudo tlmgr install tikzposter collection-latexextra collection-science \
 After either route, ensure `pdflatex` is on your PATH (open a new terminal or
 run `eval "$(/usr/libexec/path_helper)"` if it isn't).
 
+**Windows (WSL)**
+
+`pdflatex` and the build scripts must run inside WSL — they will not work from
+PowerShell or Command Prompt. Open a WSL terminal (e.g. Windows Terminal →
+Ubuntu tab), navigate to the repo, and follow the Debian/Ubuntu steps above:
+
+```bash
+# In WSL terminal (not PowerShell)
+cd /mnt/c/Users/<you>/path/to/poster   # adjust to your actual path
+bash setup.sh
+```
+
+Do **not** run `wsl bash setup.sh` from PowerShell — that path passes the
+Windows-edited file (with CRLF line endings) directly to bash, which trips on
+the `\r` characters. Running from a WSL terminal avoids this because the shell
+reads the file through the Linux filesystem layer.
+
 ---
 
 `texlive-latex-extra` / MacTeX provides `tikzposter`. `poppler-utils` / `poppler`

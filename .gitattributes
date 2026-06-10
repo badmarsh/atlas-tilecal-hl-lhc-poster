@@ -1,0 +1,11 @@
+# Force LF line endings for files that must not have CRLF (shell scripts,
+# Python, LaTeX). Without this, editing on Windows produces CRLF files and
+# bash refuses to run them: "set: pipefail\r: invalid option name".
+*.sh    text eol=lf
+*.py    text eol=lf
+*.tex   text eol=lf
+*.md    text eol=lf
+*.json  text eol=lf
+*.yaml  text eol=lf
+*.toml  text eol=lf
+*.txt   text eol=lf

@@ -2,7 +2,7 @@
 # setup.sh — install all dependencies needed to build the poster.
 # Run once after cloning, from the repo root.
 # Supports macOS (Homebrew) and Debian/Ubuntu (apt).
-set -euo pipefail
+set -eu
 
 echo "=== ATLAS TileCal poster — environment setup ==="
 

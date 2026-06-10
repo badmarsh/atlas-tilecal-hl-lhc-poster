@@ -1,0 +1,108 @@
+% =============================================================================
+%  Brand-new ATLAS Poster Skeleton
+%
+%  Style:   tikzposter, A0 portrait, ATLAS colour scheme
+%
+%  Compile:  pdflatex new_poster.tex   (run twice for references)
+% =============================================================================
+
+\documentclass[a0paper,portrait, blockverticalspace=1em, colspace=2em]{tikzposter}
+\tikzposterlatexaffectionproofoff
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{multicol}
+\usetikzlibrary{calc}
+
+% Define ATLAS color scheme
+\definecolor{maincolor}{HTML}{9e2b2f}
+\definecolor{secondarycolor}{RGB}{158, 43, 47}
+\definecolor{lightred}{RGB}{237, 199, 201}
+
+% Special colors for radiation-effect callouts
+\definecolor{tid}{RGB}{254,128,2}
+\definecolor{niel}{RGB}{0,140,0}
+\definecolor{see}{RGB}{190,0,62}
+\definecolor{sel}{RGB}{0,90,170}
+
+% Itemize spacing shortcuts — edit here to re-tune all lists at once
+\newcommand{\looseitems}{\begin{itemize}\setlength{\itemsep}{0.3em}}
+\newcommand{\tightitems}{\begin{itemize}\setlength{\itemsep}{0.15em}}
+
+% Set tikzposter theme
+\usetheme{Default}
+
+% Override default colors with ATLAS colors
+\definecolorstyle{atlascolors}{
+    \colorlet{backgroundcolor}{white}
+    \colorlet{titlefgcolor}{white}
+    \colorlet{titlebgcolor}{maincolor}
+    \colorlet{blocktitlefgcolor}{white}
+    \colorlet{blocktitlebgcolor}{maincolor}
+    \colorlet{blockbodyfgcolor}{black}
+    \colorlet{blockbodybgcolor}{lightred!25}
+}{
+}
+\usecolorstyle{atlascolors}
+
+% Custom title style (rounded box, matching the reference template)
+\definetitlestyle{sampletitle}{width=760mm, roundedcorners=20, linewidth=2pt, innersep=10pt,
+titletotopverticalspace=6mm, titletoblockverticalspace=8mm}{\begin{scope}[line width=\titlelinewidth, rounded corners=\titleroundedcorners] \draw[color=blocktitlebgcolor, fill=titlebgcolor](\titleposleft,\titleposbottom) rectangle (\titleposright,\titlepostop);
+\end{scope}
+\node[anchor=east, fill=white, rounded corners=10pt, inner sep=10pt, xshift=-22mm]
+  at ($(\titleposright,\titlepostop)!0.5!(\titleposright,\titleposbottom)$)
+  {\includegraphics[height=8.6cm]{logos/atlas_transparent.png}};}
+\usetitlestyle{sampletitle}
+
+% Title settings
+\title{\parbox{0.74\linewidth}{\centering\huge New ATLAS TileCal Poster\\[2mm] Subtitle Here}}
+\author{Author Name \quad on behalf of the ATLAS Tile Calorimeter System}
+\institute{Institution Name}
+\date{}
+
+\setlength{\columnsep}{0.5cm}
+
+\begin{document}
+
+\maketitle
+
+\begin{columns}
+
+% =========================================================================
+%  COLUMN 1 
+% =========================================================================
+\column{0.333}
+
+\block{Introduction}{
+    \looseitems
+        \item First point of introduction.
+        \item Second point of introduction.
+    \end{itemize}
+}
+
+% =========================================================================
+%  COLUMN 2 
+% =========================================================================
+\column{0.333}
+
+\block{Methodology}{
+    \tightitems
+        \item Detail about methodology.
+    \end{itemize}
+}
+
+% =========================================================================
+%  COLUMN 3
+% =========================================================================
+\column{0.333}
+
+\block{Results \& Conclusion}{
+    \tightitems
+        \item Key result 1.
+        \item Conclusion.
+    \end{itemize}
+}
+
+\end{columns}
+\end{document}
