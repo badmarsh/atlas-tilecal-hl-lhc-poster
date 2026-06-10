@@ -53,13 +53,14 @@ re-checked after *every* content edit.
 
 | Path | What it is |
 |---|---|
-| `build/irradiation_poster.tex` | **The poster. This is the only file you edit.** |
+| `build/irradiation_poster.tex` | Original poster (stable reference). |
+| `build/newest-poster.tex` | **Actively developed poster. This is the file you edit.** |
 | `build/assets/` | Figures referenced by the poster (`.png` and `.pdf`). |
 | `build/logos/` | Title-bar logo (`atlas_transparent.png`). |
 | `build/build.sh` | **Compile + preview + overflow check, one command.** Use this. |
 | `build/check_fit.py` | Deterministic overflow detector (called by `build.sh`). |
-| `build/_prev/irradiation_poster-1.png` | Latest rendered preview (regenerated each build). |
-| `template/tile_calibration_poster.tex` | Style/dimension reference only. **Do not compile or edit.** |
+| `build/_prev/<name>-1.png` | Latest rendered preview (regenerated each build). |
+| `template/tile_calibration_poster.tex` | Reusable style template (calibration poster). Can be edited and compiled; figure assets are not present so figures render as placeholders. |
 | `sources/` | Original source PDFs + their extracted text/figures. The factual ground truth for card content. |
 | `qa/` | Vision-QA reports on extraction fidelity. |
 
@@ -167,10 +168,11 @@ with a comfortable margin (aim for WARN-free, i.e. lowest content < ~97.5% down)
 A wide-and-short figure costs little height even at large width; a near-square
 one costs a lot. Trim by **height impact**, not apparent size.
 
-### Known-good col2 figure widths (the current PASS state)
-`fig_db6_blockdiagram` `0.60`, `fig_db6_tid_test` `0.56`,
-`fig_mosfet_threshold` `0.46`, with `\itemsep` `0.15em` in all three col2 blocks.
-If a content edit makes col2 overflow again, start from these and nudge.
+### Known-good col2 figure widths (current PASS state — ≥0.90 design rule)
+All three col2 figures are set to `0.90\linewidth` in `newest-poster.tex`, with
+`\itemsep` `0.15em` in all three col2 blocks. If a content edit makes col2
+overflow again, tighten prose first (§4 steps 1–2) before reducing figure widths
+below 0.90.
 
 ---
 
@@ -188,9 +190,10 @@ When the user asks to change what a card says:
      `\textcolor{tid}{...}` (orange), `\textcolor{niel}{...}` (green),
      `\textcolor{see}{...}` / `\textcolor{sel}{...}` (red/blue). Reuse them;
      don't invent new colours.
-   - Bullet lists are `\begin{itemize}\setlength{\itemsep}{0.15em} ... \end{itemize}`.
-   - Each figure sits in a `\begin{center}...\end{center}` followed by a
-     `{\small caption}`.
+   - Bullet lists use `\looseitems` (col1/col3) or `\tightitems` (col2),
+     both defined in the preamble LAYOUT PARAMETERS section.
+   - Each figure sits in a `\begin{center}...\end{center}` followed by
+     `\captiontext{caption text}`. Minimum figure width: `0.90\linewidth`.
 4. **Escape LaTeX specials in prose:** `%`→`\%`, `&`→`\&`, `_`→`\_`, `#`→`\#`,
    `$`→`\$`. Angle brackets need math mode: `<5\%` → `$<5\%$`, `≥` → `$\geq$`.
    These compile silently wrong otherwise (inverted `¿` glyphs).
@@ -236,9 +239,11 @@ running to the last pixel row with no margin.
 
 ## 8. Creating a new poster version
 
-Use `build/new_poster.tex` as the annotated starting-point skeleton (it has
-`% TODO:` markers in every block). Copy it to a new name, fill in the content,
-then build with `./build.sh <name>.tex`.
+Copy `build/newest-poster.tex` to a new name (e.g. `build/poster_v2.tex`),
+clear the block bodies, fill in new content, then build with
+`./build.sh poster_v2.tex`. The existing poster has the full preamble,
+LAYOUT PARAMETERS section, all macros, and title-bar setup already wired — it
+is the best starting point for any new poster in this repo.
 
 **Lesson learned**: a minimal "skeleton passes PASS" is not success. An agent
 that stops as soon as the layout compiles clean has done nothing useful — every

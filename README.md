@@ -72,8 +72,16 @@ for `convert` crop-and-zoom debugging (§6 of AGENTS.md).
 
 ### 2. Install Python dependency for the fit checker
 
+`setup.sh` handles this automatically — it creates `build/venv/` and installs
+`Pillow` and `numpy` there so they work even on systems that block
+`pip install --user` (e.g. modern Debian/Ubuntu). If you ran `setup.sh`
+successfully you do not need to do anything here.
+
+Manual fallback (if not using `setup.sh`):
+
 ```bash
-pip3 install Pillow
+python3 -m venv build/venv
+build/venv/bin/pip install Pillow numpy
 ```
 
 `build/check_fit.py` requires `Pillow` (PIL) and `numpy`.
@@ -123,16 +131,17 @@ python3 ../../pipeline/pdf_pipeline.py
 
 | Folder | Contents |
 |--------|----------|
-| `build/` | The poster being produced. `build/*.tex` is compiled here; `build/assets/` holds figures selected for the poster; `build/logos/` holds title-bar logos (ATLAS, university). |
-| `sources/pdf/` | The 6 original source PDFs (presentations + papers). |
+| `build/` | The poster being produced. `build/*.tex` files are compiled here; `build/assets/` holds figures selected for the poster; `build/logos/` holds title-bar logos (ATLAS, university). The actively developed poster is `build/newest-poster.tex`; `build/irradiation_poster.tex` is kept as a stable reference. |
+| `sources/pdf/` | The original source PDFs (presentations + papers). |
 | `sources/converted/` | One `Output_<name>/` per source PDF — output of the PDF→LaTeX pipeline. Each holds `<name>_mapped.tex` (extracted text + `\includegraphics` links), `assets/` (extracted figures: png/jpeg/pdf), and `slides/` (each source page burst to a single-page PDF = ground truth). |
-| `template/` | `tile_calibration_poster.tex` — the **style/dimension reference** (tikzposter, A0 portrait, ATLAS colour scheme). Not compiled; its own plot/logo assets are not present. |
+| `template/` | `tile_calibration_poster.tex` — reusable style template for calibration posters (tikzposter, A0 portrait, ATLAS colour scheme). Can be compiled; figure assets are not present in the directory so figures render as placeholder boxes. |
 | `pipeline/` | PDF→LaTeX conversion + QA tooling (`pdf_pipeline.py` and helpers). |
 | `qa/` | Vision-QA reports on extraction fidelity (`verification_report.md/.json`). |
 
 ## Source-by-source relevance (focus: irradiation studies)
 
 - **`Eduardo_IEEE_NSS_MIC_RTSD_Poster-2`** — richest single source. Full TID/NIEL/SEE/SEL qualification of the **Link & Control Daughterboard (DB6)** + production-component radiation tests (MOSFETs, INA333, SFP+, FLASH, oscillators). *Its `_mapped.tex` text is garbled (scanned poster); read content from the rendered slide image / the two Valdes papers instead.*
+- **`Eduardo_IEEE_NSS_MIC_RTSD2025_Summary`** — concise summary of the DB6 irradiation campaign and component selection outcomes. Cleaner extraction than the poster source; useful for cross-checking numbers.
 - **`ATL-TILECAL-SLIDE-2025-552`** (Moayedi) — **LVPS front-end power-supply bricks**: radiation tests on diodes, LT1681, LTC6241, LT3080, IR2110, SIHFS9N60A MOSFET, SI8920/HCPL7800 isolation amps, CHARM system-level tests, and **design optimization** (MOSFET swap: efficiency 58%→72%). Clean text + figures.
 - **`paper_Valdes_Santurio_2023_J._Inst._18_C04011`** + **`paper_ATL-TILECAL-PROC-2022-017`** — peer-reviewed DB6 radiation-study detail (exact doses, fluences, SEL tests). Clean extraction.
 - **`atlas-eps-converted-to`** — ATLAS logo for the title bar.
