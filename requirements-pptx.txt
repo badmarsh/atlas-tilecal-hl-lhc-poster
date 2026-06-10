@@ -1,0 +1,14 @@
+# PPTX export dependencies (PPT Master integration).
+# Kept separate from the heavy OCR stack in requirements.txt.
+# Install:  pip install -r requirements-pptx.txt
+#
+# See skills/ppt-master/requirements.txt for the full optional dependency set
+# (AI image gen, TTS narration, web/doc ingestion). These are only the deps the
+# poster repo's prepare -> export path needs.
+
+python-pptx>=0.6.21   # SVG/DrawingML -> .pptx (skills/ppt-master/scripts/svg_to_pptx.py)
+PyMuPDF>=1.23.0       # PDF -> Markdown ingestion (also used by the OCR pipeline)
+Pillow>=9.0.0         # image handling during SVG/PPTX conversion
+svglib>=1.5.0         # Office-compat PNG fallback rendering of SVG
+reportlab>=4.0.0      # backend for svglib
+lxml>=4.9.0           # SVG/OOXML parsing

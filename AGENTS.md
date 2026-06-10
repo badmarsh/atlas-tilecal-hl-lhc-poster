@@ -461,4 +461,32 @@ promoted to `newest-poster.tex` per §8.
   the Google GenAI client, which expects its credentials in the environment.
 - `pyproject.toml` / `main.py` are the project scaffold entry points.
 
+## 11. PPTX export (PPT Master) — optional, not the LaTeX path
+
+The poster's deliverable is the LaTeX A0 PDF. Separately, the **PPT Master**
+skill is vendored at `skills/ppt-master/` so the same source material can become
+a natively-editable PowerPoint deck (for talks, not the poster itself). It is a
+Claude skill, discoverable locally via `.claude/skills/ppt-master` (a symlink to
+the tracked `skills/` copy; `.claude/` itself is git-ignored).
+
+> [!IMPORTANT]
+> This is **not** a one-shot converter. PPT Master's `SKILL.md` (rule 9) forbids
+> script-generated SVG slides — each slide is hand-authored by the agent with
+> full context. The pipeline only does the bookends; the agent does the middle.
+
+Three stages (`pipeline/pptx_export.py`):
+
+1. `python pipeline/pptx_export.py prepare` — source PDFs (`sources/pdf/`) →
+   Markdown + an empty project skeleton under `build/pptx/<name>/`.
+2. **author** — invoke the `ppt-master` skill to write slide SVGs into
+   `build/pptx/<name>/svg_final/`, one page at a time.
+3. `python pipeline/pptx_export.py export` — SVGs → editable `.pptx` in
+   `build/pptx/<name>/exports/`.
+
+Setup: `pip install -r requirements-pptx.txt` (kept separate from the heavy OCR
+`requirements.txt`). Output under `build/pptx/` is git-ignored and regenerable;
+the skill in `skills/ppt-master/` is tracked. The 44 MB `ai-image-comparison`
+reference gallery was excluded when vendoring; `templates/icons/` (~48 MB) is the
+bulk of what remains and can be dropped if repo size matters.
+
 
