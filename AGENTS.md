@@ -30,9 +30,9 @@ Before making any changes:
 1. Read AGENTS.md in full.
 2. Run `bash setup.sh` from the repo root to install dependencies and verify
    the build. Wait for it to print "RESULT: PASS" before proceeding.
-3. Every edit to build/irradiation_poster.tex must be followed by
-   `cd build && ./build.sh`. The change is not done until check_fit.py
-   prints "RESULT: PASS".
+3. Every edit to build/newest-poster.tex (the canonical poster) must be
+   followed by `cd build && ./build.sh`. The change is not done until
+   check_fit.py prints "RESULT: PASS".
 ```
 
 ---
@@ -107,7 +107,7 @@ them automatically — it is portable.
 All agents (including Claude Code, PAI agents, and Gemini 3.1 Pro / Antigravity) fully support the skill ecosystem and can use the **`latex-document-skill`**. 
 Invoke this skill for any non-trivial LaTeX work (compiling, debugging compile errors, adding figures, tables, TikZ, fonts). `build.sh` attempts to use the skill's `compile_latex.sh` under the hood if available, but read the skill's `SKILL.md` yourself when you need its reference guides (poster design, debugging, packages) or its helper scripts — don't hand-roll LaTeX you're unsure about. Don't reach for an image/art skill to "fix" the poster; this is a LaTeX document, edited as LaTeX.
 
-The rule is the same: edit `irradiation_poster.tex`, build with `build.sh`, and don't call it done until `check_fit.py` prints `PASS`.
+The rule is the same: edit `newest-poster.tex` (the canonical poster), build with `build.sh`, and don't call it done until `check_fit.py` prints `PASS`.
 
 ---
 
@@ -194,7 +194,7 @@ Similarly, tables that are too wide should be scaled down to exactly `1.0\linewi
 When the user asks to change what a card says:
 
 1. **Find the card** by its `\block{Title}{...}` title in
-   `build/irradiation_poster.tex`.
+   `build/newest-poster.tex`.
 2. **Keep the physics correct.** Cross-check dose/fluence/efficiency numbers
    against `sources/` (the papers/slides), not from memory. Units use
    `\,` thin spaces (e.g. `40\,MHz`, `108\,Gy`).
@@ -225,7 +225,7 @@ When the user asks to change what a card says:
 ```bash
 cd build
 # bottom of the middle column, zoomed 2.5x:
-convert _prev/irradiation_poster-1.png -crop 320x180+265+1030 -resize 250% /tmp/crop.png
+convert _prev/newest-poster-1.png -crop 320x180+265+1030 -resize 250% /tmp/crop.png
 # columns are roughly: col1 x≈0..283, col2 x≈283..566, col3 x≈566..849 (of 849 wide)
 ```
 
@@ -352,7 +352,7 @@ Column 3 (right):
 
 ## Style rules (non-negotiable)
 
-- Copy the preamble from build/new_poster.tex — do not invent a new one.
+- Copy the preamble from build/newest-poster.tex — do not invent a new one.
 - Use \looseitems for col1/col3 bullets, \tightitems for col2 bullets.
 - Radiation-effect terms: \textcolor{tid}{TID}, \textcolor{niel}{NIEL},
   \textcolor{see}{SEE}, \textcolor{sel}{SEL}.
@@ -430,5 +430,35 @@ Every subcommand supports `--dry-run`. `archive` copies by default; `--move`
 relocates the PDF/preview instead. Archived PDFs, previews, and
 `poster_*_*.tex` snapshots are git-ignored (regenerable from the build) — use
 `git add -f` to keep a curated final.
+
+---
+
+## 10. Automated pipeline (DeerFlow) — optional, not the normal path
+
+For a normal "edit the wording / fix the layout" request you do **not** touch
+this. It exists to regenerate a poster end-to-end from the source PDFs with an
+LLM. The orchestrator chains six stages (`pipeline/deerflow_orchestrator.py`):
+
+1. `pdf_pipeline.py` — extract source PDFs → `Output_*/` (mapped TeX + assets).
+2. `prep_vision_qa.py` — render ground-truth slide images for QA.
+3. `create_stitched.py` — stitch assets for eyeball checks.
+4. `qa_verifier.py` — Gemini Vision QA → `qa/verification_report.{md,json}`.
+5. `generate_poster.py` — LLM writes `build/drafts/auto_generated_poster.tex`.
+6. `build.sh drafts/auto_generated_poster.tex` — compile + fit-check.
+
+Treat the generated `.tex` as a **draft**: it lands in `build/drafts/` and is
+not canonical until a human reviews it, it passes `check_fit.py`, and it is
+promoted to `newest-poster.tex` per §8.
+
+### Configuration & secrets
+
+- `config.yaml` — model endpoints (OpenRouter, NVIDIA NIM). API keys are read
+  from environment variables, not hard-coded.
+- `.env` — holds the live API keys (`OPENROUTER_API_KEY`, `NVIDIA_API_KEY`,
+  Gemini). **Git-ignored — never commit it.** Copy the keys you need into your
+  own `.env` locally; rotate any key that is ever exposed.
+- `generate_poster.py` reads `GEMINI_MODEL` (default `gemini-3.1-pro`) and uses
+  the Google GenAI client, which expects its credentials in the environment.
+- `pyproject.toml` / `main.py` are the project scaffold entry points.
 
 

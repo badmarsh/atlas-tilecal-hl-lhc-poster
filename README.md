@@ -126,6 +126,26 @@ cd sources/pdf
 python3 ../../pipeline/pdf_pipeline.py
 ```
 
+### 6. (Optional) Auto-generate a poster with the DeerFlow pipeline
+
+`pipeline/deerflow_orchestrator.py` chains extraction → vision-QA → LLM poster
+generation → compile. It writes `build/drafts/auto_generated_poster.tex` and
+builds it through the same `build.sh` fit-check. This is **not** the normal
+editing path — see [AGENTS.md §10](AGENTS.md) for the full stage list.
+
+It needs API keys. Copy your keys into a local `.env` (git-ignored — never
+commit it); endpoints are configured in `config.yaml`:
+
+```bash
+# .env  (example — use your own keys)
+OPENROUTER_API_KEY=...
+NVIDIA_API_KEY=...
+```
+
+Treat the generated `.tex` as a draft: a human must review it, confirm
+`check_fit.py` prints `PASS`, and promote it to `newest-poster.tex` before it
+is canonical.
+
 ---
 
 ## Directory layout
@@ -136,8 +156,11 @@ python3 ../../pipeline/pdf_pipeline.py
 | `sources/pdf/` | The original source PDFs (presentations + papers). |
 | `sources/converted/` | One `Output_<name>/` per source PDF — output of the PDF→LaTeX pipeline. Each holds `<name>_mapped.tex` (extracted text + `\includegraphics` links), `assets/` (extracted figures: png/jpeg/pdf), and `slides/` (each source page burst to a single-page PDF = ground truth). |
 | `template/` | `tile_calibration_poster.tex` — reusable style template for calibration posters (tikzposter, A0 portrait, ATLAS colour scheme). Can be compiled; figure assets are not present in the directory so figures render as placeholder boxes. |
-| `pipeline/` | PDF→LaTeX conversion + QA tooling (`pdf_pipeline.py` and helpers). |
+| `pipeline/` | PDF→LaTeX conversion + QA tooling (`pdf_pipeline.py` and helpers), plus the optional DeerFlow auto-generation pipeline (`deerflow_orchestrator.py`, `generate_poster.py`). |
 | `qa/` | Vision-QA reports on extraction fidelity (`verification_report.md/.json`). |
+| `config.yaml` | Model-endpoint config (OpenRouter, NVIDIA NIM) for the auto-pipeline; API keys come from the environment. |
+| `.env` | Live API keys for the auto-pipeline. **Git-ignored — never commit.** |
+| `pyproject.toml`, `main.py` | Project scaffold / entry point. |
 
 ## Source-by-source relevance (focus: irradiation studies)
 
