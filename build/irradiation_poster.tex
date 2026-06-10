@@ -20,7 +20,7 @@
 %  Compile:  pdflatex irradiation_poster.tex   (run twice for references)
 % =============================================================================
 
-\documentclass[a0paper,portrait, blockverticalspace=2em, colspace=2em]{tikzposter}
+\documentclass[a0paper,portrait, blockverticalspace=1em, colspace=2em]{tikzposter}
 \tikzposterlatexaffectionproofoff
 \usepackage{graphicx}
 \usepackage{amsmath}
@@ -39,7 +39,11 @@
 \definecolor{niel}{RGB}{0,140,0}
 \definecolor{see}{RGB}{190,0,62}
 \definecolor{sel}{RGB}{0,90,170}
-\definecolor{turquoise}{RGB}{0,170,170}
+
+% Itemize spacing shortcuts — edit here to re-tune all lists at once
+% col1 (loose) vs col2/3 (tight, needed to keep middle column from overflowing)
+\newcommand{\looseitems}{\begin{itemize}\setlength{\itemsep}{0.3em}}
+\newcommand{\tightitems}{\begin{itemize}\setlength{\itemsep}{0.15em}}
 
 % Set tikzposter theme
 \usetheme{Default}
@@ -88,20 +92,20 @@ Optimization of the\\[2mm] ATLAS Tile Calorimeter for the High-Luminosity LHC}}
 \column{0.333}
 
 \block{The ATLAS Tile Calorimeter \& the HL-LHC Upgrade}{
-    \begin{itemize}\setlength{\itemsep}{0.3em}
-        \item TileCal is the central hadronic sampling calorimeter of ATLAS
-        (steel absorber + plastic scintillating tiles, $|\eta|<1.7$). It
-        identifies and measures hadronic jets, hadronically decaying
-        $\tau$-leptons and missing transverse energy, and assists in muon
-        identification.
-        \item For the \textbf{High-Luminosity LHC} the instantaneous luminosity
-        and pile-up rise steeply. The on-detector electronics are \textbf{fully
-        replaced} to provide continuous digital read-out of all channels at
-        \textbf{40\,MHz} with improved timing and energy resolution.
-        \item The new electronics must survive a much harsher radiation field, so
-        every component is qualified against
+    \looseitems
+        \item As the primary hadronic sampling calorimeter of ATLAS, TileCal
+        (built from steel absorbers and scintillating plastic tiles, covering $|\eta|<1.7$)
+        is crucial for measuring hadronic jets, missing transverse energy,
+        hadronically decaying $\tau$-leptons, and for muon identification.
+        \item To cope with the unprecedented instantaneous luminosity and pile-up
+        of the \textbf{High-Luminosity LHC}, the entire on-detector electronics system
+        is being \textbf{fully replaced}. This upgrade enables fully continuous,
+        un-triggered digital read-out of all channels at \textbf{40\,MHz} with
+        enhanced energy and timing resolution.
+        \item This new hardware faces a vastly harsher radiation environment.
+        Consequently, every single component must be rigorously qualified against
         \textbf{\textcolor{tid}{Total Ionizing Dose (TID)}},
-        \textbf{\textcolor{niel}{Non-Ionizing Energy Loss (NIEL)}} and
+        \textbf{\textcolor{niel}{Non-Ionizing Energy Loss (NIEL)}}, and
         \textbf{\textcolor{see}{Single Event Effects (SEE/SEL)}}.
     \end{itemize}
     \vspace{0.12cm}
@@ -114,20 +118,20 @@ Optimization of the\\[2mm] ATLAS Tile Calorimeter for the High-Luminosity LHC}}
 }
 
 \block{Read-Out Chain \& Radiation Requirements}{
-    \begin{itemize}\setlength{\itemsep}{0.3em}
-        \item The on-detector is segmented into \textbf{896 Minidrawers (MDs)},
-        each sampling up to 12 PMTs at 40\,MHz. A MD hosts Front-End Boards
-        (shaping), a \textbf{Mainboard (MB)} (digitization), a
-        \textbf{Daughterboard (DB)} (timing, control and data transmission), all
-        powered by the \textbf{Low-Voltage Power Supply (LVPS)}.
-        \item Digitized data are sent off-detector over multi-Gbps optical links to
-        the Tile PreProcessor (TilePPr) and FELIX.
-        \item Requirements are set from ATLAS simulations at the
-        \emph{most-irradiated} positions, scaled by safety factors (SF):
-        \textbf{1.5} (simulation), \textbf{$\times$3--5} (lot variation / low-dose-rate)
-        and \textbf{1.3} (non-monoenergetic beam).
-        \item Daughterboard targets (incl. SFs):
-        \textbf{\textcolor{tid}{TID $\approx$ 108 Gy}},
+    \looseitems
+        \item The on-detector electronics are partitioned into \textbf{896 Minidrawers (MDs)}.
+        Each MD processes signals from up to 12 PMTs at 40\,MHz. The MD houses
+        Front-End Boards (signal shaping), a \textbf{Mainboard (MB)} (digitization),
+        and a \textbf{Daughterboard (DB)} (control, clock distribution, and high-speed data transmission).
+        Power is supplied by the \textbf{Low-Voltage Power Supply (LVPS)}.
+        \item Digital streams are transmitted off-detector via multi-Gbps optical links
+        to FELIX and the Tile PreProcessor (TilePPr).
+        \item Radiation criteria are based on ATLAS simulations for the
+        \emph{most-exposed} regions, scaled by rigorous safety factors (SF):
+        \textbf{1.5} (simulation uncertainty), \textbf{$\times$3--5} (low-dose-rate effects / lot-to-lot variation),
+        and \textbf{1.3} (non-monoenergetic beams).
+        \item Final Daughterboard targets (with SFs applied):
+        \textbf{\textcolor{tid}{TID $\approx$ 108\,Gy}},
         \textbf{\textcolor{niel}{NIEL $\approx 13.16\times10^{12}$ n/cm$^2$}},
         \textbf{\textcolor{see}{SEE $\approx 4.54\times10^{11}$ h/cm$^2$}}.
     \end{itemize}
@@ -162,70 +166,69 @@ Optimization of the\\[2mm] ATLAS Tile Calorimeter for the High-Luminosity LHC}}
 \column{0.333}
 
 \block{The Link \& Control Daughterboard (DB6)}{
-    \begin{itemize}\setlength{\itemsep}{0.15em}
-        \item The DB distributes the LHC-synchronized clock, configuration and
-        control to the front-end, and continuously transmits the digitized MB
-        data off-detector over multi-Gbps optical links.
-        \item Now on its sixth revision (\textbf{DB6}), with radiation tolerance
-        engineered through a \textbf{double-redundant} scheme: two
-        functionally-equivalent halves (A/B), \textbf{Triple Modular Redundancy
-        (TMR)}, \textbf{Xilinx Soft Error Mitigation (SEM)}, \textbf{GBT-FEC}
-        forward error correction and SEL-protection circuitry.
-        \item Key parts: 4$\times$ commercial \textbf{SFP+} (two 4.8\,Gbps
-        downlinks, four 9.6\,Gbps uplinks), CERN rad-hard \textbf{GBTx} ASICs,
-        Microsemi \textbf{ProASIC3} FPGAs and Xilinx \textbf{Kintex UltraScale
-        (KU)} FPGAs. COTS components are used wherever possible.
+    \tightitems
+        \item Serving as the communications hub, the DB delivers the LHC-synchronized clock
+        and configuration to the front-end, while streaming digitized MB data
+        off-detector through high-speed optical links.
+        \item The sixth revision (\textbf{DB6}) achieves exceptional radiation
+        tolerance via a \textbf{double-redundant} architecture (A/B halves).
+        Robustness is ensured by \textbf{Triple Modular Redundancy (TMR)},
+        \textbf{Xilinx Soft Error Mitigation (SEM)}, \textbf{GBT-FEC}
+        error correction, and SEL-protection circuitry.
+        \item Core components include 4$\times$ commercial \textbf{SFP+} transceivers
+        (two 4.8\,Gbps downlinks, four 9.6\,Gbps uplinks), custom CERN \textbf{GBTx} ASICs,
+        Xilinx \textbf{Kintex UltraScale (KU)} and Microsemi \textbf{ProASIC3} FPGAs.
+        COTS parts are utilized wherever feasible.
     \end{itemize}
-    \vspace{0.08cm}
+    \vspace{0cm}
     \begin{center}
-        \includegraphics[width=0.60\linewidth]{assets/fig_db6_blockdiagram.png}
+        \includegraphics[width=0.55\linewidth]{assets/fig_db6_blockdiagram.png}
     \end{center}
-    \vspace{-0.2cm}
+    \vspace{-0.3cm}
     {\small DB6 block diagram: two redundant halves, KU + ProASIC FPGAs, GBTx and
     four SFP+ optical links.}
 }
 
 \block{DB6 Radiation Qualification: TID, NIEL \& SEL}{
-    \begin{itemize}\setlength{\itemsep}{0.15em}
-        \item Four boards (DB6-0\,\dots\,DB6-3) were produced and irradiated separately.
-        \item \textbf{\textcolor{tid}{TID}}: DB6-1/-2 $\gamma$-irradiated at the CERN
-        CC60 ($^{60}$Co) facility to 220\,Gy (3.37\,Gy/h) and 54\,Gy (0.33\,Gy/h);
-        DB6-3 with 54\,MeV protons at IFJ Kraków to $\sim$400\,Gy (2.88\,Gy/h). All
-        currents and temperatures stayed stable; no component was damaged by TID.
-        \item \textbf{\textcolor{niel}{NIEL}}: DB6-0 and test boards irradiated in the
-        TRIGA reactor (JSI Ljubljana) to $14\times10^{12}$ n$_\text{eq}$/cm$^2$. KU
-        FPGAs tolerant; ProASIC and FLASH firmware fully recovered after annealing.
-        \item \textbf{\textcolor{sel}{SEL}}: 54\,MeV protons to $2.62\times10^{11}$
-        p/cm$^2$ and 226\,MeV protons to $1.11\times10^{12}$ p/cm$^2$ —
-        \textbf{no single-event latch-ups} observed.
+    \tightitems
+        \item Comprehensive testing was performed on four prototype boards (DB6-0 to DB6-3).
+        \item \textbf{\textcolor{tid}{TID}}: DB6-1 and DB6-2 underwent $\gamma$-irradiation at the CERN
+        CC60 ($^{60}$Co) facility to 220\,Gy (3.37\,Gy/h) and 54\,Gy (0.33\,Gy/h).
+        DB6-3 was exposed to 54\,MeV protons at IFJ Kraków to $\sim$400\,Gy (2.88\,Gy/h).
+        Temperatures and currents remained stable, confirming no TID-induced damage.
+        \item \textbf{\textcolor{niel}{NIEL}}: DB6-0 was irradiated at the TRIGA reactor (JSI Ljubljana)
+        to $14\times10^{12}$ n$_\text{eq}$/cm$^2$. The KU FPGAs exhibited strong tolerance, while
+        the ProASIC and FLASH firmware recovered full functionality after annealing.
+        \item \textbf{\textcolor{sel}{SEL}}: Testing with 54\,MeV protons ($2.62\times10^{11}$ p/cm$^2$)
+        and 226\,MeV protons ($1.11\times10^{12}$ p/cm$^2$) yielded \textbf{zero single-event latch-ups}.
     \end{itemize}
-    \vspace{0.08cm}
+    \vspace{0cm}
     \begin{center}
-        \includegraphics[width=0.56\linewidth]{assets/fig_db6_tid_test.png}
+        \includegraphics[width=0.54\linewidth]{assets/fig_db6_tid_test.png}
     \end{center}
-    \vspace{-0.2cm}
+    \vspace{-0.3cm}
     {\small DB6-3 board currents and FPGA temperature, stable over the full
     $\sim$400\,Gy proton TID run (both halves).}
 }
 
 \block{Component Results \& Production}{
-    \begin{itemize}\setlength{\itemsep}{0.15em}
-        \item \textbf{SFP+}: AVAGO failed and 1/9 CORETEK failed at $9\times10^{12}$
-        n/cm$^2$; \textbf{Direktronik 33-4248} and \textbf{FS-Europe SFP-10GSR-85}
-        stayed fully functional and were selected.
-        \item \textbf{FDFMA3N109 MOSFETs}: threshold shifted with dose $\Rightarrow$
-        SEL over-current circuit \textbf{removed}. \textbf{LTC6902} oscillators:
-        4/15 failed $\Rightarrow$ \textbf{removed}. INA333, Schottky diodes and
-        540BAA oscillators passed.
-        \item \textbf{Outcome}: key DB6 components qualified to HL-LHC TID/NIEL/SEL;
-        the design is simplified by dropping the radiation-sensitive parts.
-        $\sim$\textbf{930 Daughterboards} produced (Stockholm Univ.)\ in \textbf{2026--2027}.
+    \tightitems
+        \item \textbf{SFP+ Transceivers}: AVAGO devices failed completely, and 1/9 CORETEK
+        modules failed at $9\times10^{12}$ n/cm$^2$. \textbf{Direktronik 33-4248} and
+        \textbf{FS-Europe SFP-10GSR-85} maintained full functionality and were chosen.
+        \item \textbf{Design Iterations}: \textbf{FDFMA3N109 MOSFETs} showed threshold shifts,
+        prompting removal of the SEL over-current circuit. Also, 4/15 \textbf{LTC6902}
+        oscillators failed and were eliminated. INA333, Schottky diodes, and
+        540BAA oscillators passed successfully.
+        \item \textbf{Final Status}: All essential DB6 components are fully qualified.
+        Eliminating radiation-sensitive components yielded a simpler, robust design.
+        $\sim$\textbf{930 Daughterboards} will be produced (Stockholm Univ.) in \textbf{2026--2027}.
     \end{itemize}
-    \vspace{0.08cm}
+    \vspace{0cm}
     \begin{center}
-        \includegraphics[width=0.46\linewidth]{assets/fig_mosfet_threshold.png}
+        \includegraphics[width=0.45\linewidth]{assets/fig_mosfet_threshold.png}
     \end{center}
-    \vspace{-0.2cm}
+    \vspace{-0.3cm}
     {\small FDFMA3N109 threshold shift (IV curves, left) correlated with the reactor
     cavity flux map (right).}
 }
@@ -236,72 +239,59 @@ Optimization of the\\[2mm] ATLAS Tile Calorimeter for the High-Luminosity LHC}}
 \column{0.333}
 
 \block{LVPS Bricks \& Design Optimization}{
-    \begin{itemize}\setlength{\itemsep}{0.3em}
-        \item The LVPS sits in the module \emph{finger} — the harshest radiation
-        location in TileCal. Phase-2 uses \textbf{8 independent DC-DC ``bricks''}
-        per module, each a two-switch forward converter (300\,kHz) stepping
-        \textbf{200\,V $\rightarrow$ 10\,V} at $\sim$23\,W. The 8-fold segmentation
-        improves reliability and limits the impact of any single failure during
-        data-taking.
-        \item \textbf{Efficiency}: power MOSFET STB57N65M5 $\rightarrow$
-        \textbf{SIHFS9N60A} raised brick efficiency from $\sim$58\% to
-        \textbf{$\sim$72\%} (above the $\geq$65\% required by the 77\,kW cooling
-        plant) with 65\% smaller gate--source capacitance; the output inductor was
-        replaced by a lower-resistance part to cut heating.
-        \item \textbf{Control wiring} reduced from \textbf{18} (legacy) to
-        \textbf{9} signals (Phase-2 tri-state turn-on / turn-off / keep-state +
-        common return), easing the cabling from the service room.
+    \tightitems
+        \item Located in the module \emph{fingers}, the LVPS experiences the most severe
+        radiation environment within TileCal. The Phase-II design deploys \textbf{8 independent DC-DC ``bricks''}
+        per module. Each brick is a 300\,kHz two-switch forward converter that steps
+        \textbf{200\,V down to 10\,V} ($\sim$23\,W). This 8-way segmentation boosts system reliability
+        and isolates potential localized failures.
+        \item \textbf{Enhanced Efficiency}: Replacing the STB57N65M5 power MOSFET with the
+        \textbf{SIHFS9N60A} drastically improved the brick's efficiency from $\sim$58\% to
+        \textbf{$\sim$72\%}. This comfortably surpasses the $\geq$65\% threshold demanded by the
+        77\,kW cooling infrastructure, aided by a 65\% reduction in gate--source capacitance.
+        Furthermore, a lower-resistance output inductor was integrated to minimize thermal dissipation.
+        \item \textbf{Simplified Control Wiring}: The control lines were halved from \textbf{18} (legacy system)
+        down to just \textbf{9} signals. This was achieved by introducing a tri-state logic scheme
+        (turn-on / turn-off / keep-state) sharing a common return, significantly simplifying routing from the service cavern.
     \end{itemize}
-    \vspace{0.25cm}
+    \vspace{0.1cm}
     \begin{center}
-        \includegraphics[width=0.99\linewidth]{assets/fig_lvps_brick.pdf}\\[4mm]
-        \includegraphics[width=0.78\linewidth]{assets/fig_wire_reduction.pdf}
+        \includegraphics[width=0.85\linewidth]{assets/fig_lvps_brick.pdf}\\[2mm]
+        \includegraphics[width=0.65\linewidth]{assets/fig_wire_reduction.pdf}
     \end{center}
-    \vspace{-0.2cm}
+    \vspace{-0.3cm}
     {\small LVPS brick functional diagram and top view; legacy vs.\ Phase-2 control
     wiring.}
 }
 
 \block{LVPS Radiation Qualification}{
-    \begin{itemize}\setlength{\itemsep}{0.3em}
-        \item Components qualified for \textbf{\textcolor{tid}{TID}} (CC60; PSI for
-        bipolar parts), \textbf{\textcolor{niel}{NIEL}} (TRIGA at JSI, to
-        $8\times10^{12}$ n/cm$^2$), \textbf{\textcolor{see}{SEE}} (PIF at PSI,
-        200\,MeV protons) and whole-brick \textbf{system-level tests at CERN CHARM}.
-        \item Diodes (7 types), \textbf{LT1681} controller, \textbf{LTC6241}
-        op-amp, \textbf{LT3080} regulator, \textbf{IR2110} driver and
-        \textbf{SIHFS9N60A} MOSFET passed; only small SETs / threshold shifts with
-        no impact on brick performance.
-        \item \textbf{Isolation amplifier}: SI8920 showed output fluctuations in
-        early SEE/TID tests and was temporarily replaced by HCPL7800 for
-        pre-production; later tests showed SI8920 is \textbf{stable below 100\,mV
-        input}, so the final design constrains its input to $\leq$100\,mV and keeps
-        SI8920.
-        \item \textbf{CHARM system-level}: pre-production MOSFETs failed at 323\,Gy
-        (criterion 80\,Gy) and HCPL7800 at $2.75\times10^{12}$ n/cm$^2$
-        (displacement damage) — driving the final component choices.
+    \tightitems
+        \item Components were scrutinized for \textbf{\textcolor{tid}{TID}} (CC60/PSI),
+        \textbf{\textcolor{niel}{NIEL}} (TRIGA), and \textbf{\textcolor{see}{SEE}}
+        (PIF). Assembled bricks were validated in \textbf{system tests at CERN CHARM}.
+        \item Critical parts (e.g., 7 diodes, \textbf{LT1681}, \textbf{LTC6241},
+        \textbf{LT3080}, \textbf{IR2110}, \textbf{SIHFS9N60A}) passed qualification with only minor shifts.
+        \item \textbf{Isolation Amp}: The SI8920 exhibited early SEE instability.
+        Investigations proved it is perfectly \textbf{stable when input is $\leq$100\,mV}. The final design enforces this.
+        \item \textbf{CHARM Validations}: Pre-production MOSFETs failed at 323\,Gy (well beyond 80\,Gy req.)
+        and the HCPL7800 failed at $2.75\times10^{12}$ n/cm$^2$, dictating final component selections.
     \end{itemize}
-    \vspace{0.12cm}
+    \vspace{0cm}
     \begin{center}
-        \includegraphics[width=0.99\linewidth]{assets/fig_lvps_tests_overview.pdf}
+        \includegraphics[width=0.85\linewidth]{assets/fig_lvps_tests_overview.pdf}
     \end{center}
-    \vspace{-0.2cm}
+    \vspace{-0.3cm}
     {\small Irradiation campaign overview: facility and beam per test type.}
 }
 
 \block{Conclusions \& Outlook}{
-    \begin{itemize}\setlength{\itemsep}{0.3em}
-        \item Both Phase-2 on-detector subsystems — the \textbf{Link Daughterboard}
-        and the \textbf{LVPS bricks} — meet the HL-LHC
-        \textcolor{tid}{TID}, \textcolor{niel}{NIEL} and \textcolor{see}{SEE}
-        requirements after iterative irradiation campaigns.
-        \item The irradiation studies \textbf{directly drove design optimization}:
-        removal of radiation-sensitive parts on the DB (over-current MOSFETs, QUAD
-        oscillators); component selection plus efficiency and wiring improvements on
-        the LVPS.
-        \item \textbf{Production}: $\sim$930 Daughterboards in 2026--2027; LVPS
-        DC-DC converter, ProASIC and KU FPGA lot qualification continuing through
-        2025--2026.
+    \tightitems
+        \item Both \textbf{LVPS bricks} and the \textbf{Link Daughterboard}
+        successfully satisfy HL-LHC \textcolor{tid}{TID}, \textcolor{niel}{NIEL}, and \textcolor{see}{SEE} benchmarks.
+        \item Radiation studies \textbf{directly drove design optimization}: vulnerable parts
+        were removed from the DB, while the LVPS gained improved efficiency and simplified wiring.
+        \item \textbf{Project Outlook}: Mass production of $\sim$930 Daughterboards is slated for 2026--2027.
+        Lot-acceptance testing proceeds through 2025--2026.
     \end{itemize}
 }
 

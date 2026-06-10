@@ -42,8 +42,8 @@ case "$OS" in
 esac
 
 echo
-echo ":: installing Python dependency (Pillow)"
-python3 -m pip install --quiet --user Pillow
+echo ":: installing Python dependencies (Pillow, numpy)"
+python3 -m pip install --quiet --user Pillow numpy
 
 echo
 echo ":: verifying build"

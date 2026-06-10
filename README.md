@@ -59,7 +59,7 @@ for `convert` crop-and-zoom debugging (§6 of AGENTS.md).
 pip3 install Pillow
 ```
 
-`build/check_fit.py` uses only `Pillow` (PIL) and the standard library.
+`build/check_fit.py` requires `Pillow` (PIL) and `numpy`.
 
 ### 3. (PAI / Claude Code environment only) latex-document-skill
 

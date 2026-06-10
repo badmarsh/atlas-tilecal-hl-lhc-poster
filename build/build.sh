@@ -25,7 +25,7 @@ rm -f "${BASE}.pdf"
 # Prefer Marek's latex-document-skill compiler if present (auto-installs
 # texlive/poppler, filters logs); otherwise fall back to plain pdflatex so this
 # script also works for Gemini/Antigravity and bare environments.
-SKILL="/home/ubuntu/.claude/skills/latex-document-skill/scripts/compile_latex.sh"
+SKILL="$HOME/.claude/skills/latex-document-skill/scripts/compile_latex.sh"
 if [ -x "$SKILL" ] || [ -f "$SKILL" ]; then
     echo ":: compiling via latex-document-skill"
     bash "$SKILL" "$TEX" --preview --preview-dir "$PREVDIR"

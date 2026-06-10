@@ -5,6 +5,7 @@ __pycache__/
 
 # LaTeX build artifacts
 build/_prev/
+build/*.pdf
 *.aux
 *.log
 *.out
@@ -17,6 +18,7 @@ build/_prev/
 
 # QA / extraction scratch (regenerable)
 .verify_scratch/
+sources/converted/
 
 # Scratch crops / temp images at repo or build root
 /_*.png
