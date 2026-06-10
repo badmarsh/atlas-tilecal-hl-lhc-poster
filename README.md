@@ -86,13 +86,9 @@ build/venv/bin/pip install Pillow numpy
 
 `build/check_fit.py` requires `Pillow` (PIL) and `numpy`.
 
-### 3. (PAI / Claude Code environment only) latex-document-skill
+### 3. latex-document-skill (for all agents)
 
-If you are running inside PAI, `build.sh` auto-detects and uses
-`~/.claude/skills/latex-document-skill/scripts/compile_latex.sh` when present.
-No extra setup needed — the skill handles `texlive` installation and log
-filtering. In bare environments the script falls back to plain `pdflatex`
-automatically.
+If you are running inside an agent environment (like Claude Code, PAI, or Gemini Antigravity), the `latex-document-skill` is available through the plugin system. `build.sh` auto-detects and uses the skill's `compile_latex.sh` script when present. No extra setup needed — the skill handles `texlive` installation and log filtering. In bare environments the script falls back to plain `pdflatex` automatically.
 
 ### 4. Build and verify
 
@@ -113,6 +109,11 @@ RESULT: PASS -- every card closes inside the page.
 
 If you see `RESULT: FAIL`, the poster content overflows a column. Follow §4 of
 [AGENTS.md](AGENTS.md) to reclaim vertical space.
+
+Each root build also auto-archives a timestamped copy into `build/drafts/`
+(`poster_<NNN>_<datetime>.{pdf,tex,png}`) and clears LaTeX temp files, via
+`build/maintenance.py`. See [AGENTS.md §9](AGENTS.md) for the naming scheme and
+the `ARCHIVE` / `ARCHIVE_KEEP` toggles.
 
 ### 5. (Optional) Re-run the PDF→LaTeX extraction pipeline
 

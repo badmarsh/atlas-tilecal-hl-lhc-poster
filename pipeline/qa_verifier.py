@@ -2,15 +2,26 @@ import os
 import glob
 import json
 import re
-import fitz  # PyMuPDF
-import PIL.Image
+import time
 import io
+import sys
 from pathlib import Path
 from typing import List, Optional
 
-from google import genai
-from google.genai import types
-from pydantic import BaseModel, Field
+try:
+    import fitz  # PyMuPDF
+    import PIL.Image
+    from google import genai
+    from google.genai import types
+    from pydantic import BaseModel, Field
+except ImportError as e:
+    sys.exit(f"ERROR: a required dependency is missing ({e.name}).\n"
+             "       This QA verifier needs PyMuPDF, Pillow, google-genai and pydantic:\n"
+             "       pip install -r requirements.txt google-genai pydantic")
+
+# Network robustness for the Gemini call.
+MAX_RETRIES = int(os.environ.get("GEMINI_MAX_RETRIES", "3"))
+RETRY_BACKOFF_S = float(os.environ.get("GEMINI_RETRY_BACKOFF", "2.0"))
 
 # --- Pydantic Schema for structured output ---
 class Dimension(BaseModel):
@@ -192,12 +203,30 @@ def verify_slide(client: genai.Client, system_instruction: str, base_name: str, 
         temperature=0.0,
     )
     
-    response = client.models.generate_content(
-        model=MODEL_ID,
-        contents=contents,
-        config=config
-    )
-    
+    # Retry transient API/network failures with exponential backoff.
+    response = None
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            response = client.models.generate_content(
+                model=MODEL_ID,
+                contents=contents,
+                config=config
+            )
+            break
+        except Exception as e:
+            if attempt >= MAX_RETRIES:
+                print(f"    Error: Gemini call failed for slide {slide_num} "
+                      f"after {MAX_RETRIES} attempts: {e}")
+                return None
+            wait = RETRY_BACKOFF_S * attempt
+            print(f"    Warning: Gemini call failed (attempt {attempt}/{MAX_RETRIES}); "
+                  f"retrying in {wait:.0f}s: {e}")
+            time.sleep(wait)
+
+    if response is None or not getattr(response, "text", None):
+        print(f"Empty response for slide {slide_num}.")
+        return None
+
     try:
         return json.loads(response.text)
     except json.JSONDecodeError:

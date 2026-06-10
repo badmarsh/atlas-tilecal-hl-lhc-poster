@@ -53,16 +53,29 @@ re-checked after *every* content edit.
 
 | Path | What it is |
 |---|---|
-| `build/irradiation_poster.tex` | Original poster (stable reference). |
-| `build/newest-poster.tex` | **Actively developed poster. This is the file you edit.** |
+| `build/newest-poster.tex` | **Canonical, actively developed poster. This is the file you edit and ship.** |
+| `build/irradiation_poster.tex` | Original stable reference (do not modify unless explicitly asked). |
 | `build/assets/` | Figures referenced by the poster (`.png` and `.pdf`). |
 | `build/logos/` | Title-bar logo (`atlas_transparent.png`). |
 | `build/build.sh` | **Compile + preview + overflow check, one command.** Use this. |
 | `build/check_fit.py` | Deterministic overflow detector (called by `build.sh`). |
-| `build/_prev/<name>-1.png` | Latest rendered preview (regenerated each build). |
-| `template/tile_calibration_poster.tex` | Reusable style template (calibration poster). Can be edited and compiled; figure assets are not present so figures render as placeholders. |
+| `build/maintenance.py` | Archives built PDFs into `drafts/`, cleans temp files, migrates/prunes drafts (called by `build.sh`; see §9). |
+| `build/_prev/<name>-1.png` | Preview for root-level posters (regenerated each build). |
+| `build/drafts/` | **All draft/experimental poster versions live here.** |
+| `build/drafts/_prev/<name>-1.png` | Preview for draft posters (regenerated each build). |
+| `template/tile_calibration_poster.tex` | Reusable style template (calibration poster). |
 | `sources/` | Original source PDFs + their extracted text/figures. The factual ground truth for card content. |
 | `qa/` | Vision-QA reports on extraction fidelity. |
+
+### Output-location convention
+
+| Source file location | PDF output | Preview PNG |
+|---|---|---|
+| `build/newest-poster.tex` | `build/newest-poster.pdf` | `build/_prev/newest-poster-1.png` |
+| `build/irradiation_poster.tex` | `build/irradiation_poster.pdf` | `build/_prev/irradiation_poster-1.png` |
+| `build/drafts/<name>.tex` | `build/drafts/<name>.pdf` | `build/drafts/_prev/<name>-1.png` |
+
+The key rule: **draft work always stays in `build/drafts/`**. Do not create new `.tex` files in `build/` root — put them in `build/drafts/` instead.
 
 Everything else (`venv/`, `.verify_scratch/`, `pipeline/`) is the one-time
 PDF→LaTeX extraction toolchain. **You almost never need it.** Do not run or
@@ -74,11 +87,15 @@ modify it for a normal "change the wording / fix the layout" request.
 
 ```bash
 cd build
-./build.sh           # compiles, renders _prev/irradiation_poster-1.png, runs check_fit.py
+./build.sh                        # compiles newest-poster.tex (the canonical poster)
+./build.sh drafts/my_draft.tex    # compiles a draft; all outputs land in build/drafts/
 ```
 
-Then **read the preview image** `build/_prev/irradiation_poster-1.png` and trust
-the `check_fit.py` verdict it prints. A change is not done until:
+Then **read the preview image** and trust the `check_fit.py` verdict.
+For `newest-poster.tex` the preview is `build/_prev/newest-poster-1.png`.
+For a draft `build/drafts/foo.tex`, the preview is `build/drafts/_prev/foo-1.png`.
+
+A change is not done until:
 
 1. `build.sh` prints `RESULT: PASS`, **and**
 2. you have visually looked at the preview (or the relevant column crop).
@@ -87,19 +104,10 @@ If you only have `pdflatex`/`pdftoppm` (no PAI skill), `build.sh` falls back to
 them automatically — it is portable.
 
 ### Use your LaTeX tooling/skill
-- **Claude Code / PAI agents:** invoke the **`latex-document-skill`** for any
-  non-trivial LaTeX work (compiling, debugging compile errors, adding figures,
-  tables, TikZ, fonts). `build.sh` already calls that skill's `compile_latex.sh`
-  under the hood, but load the skill yourself when you need its reference guides
-  (poster design, debugging, packages) or its helper scripts — don't hand-roll
-  LaTeX you're unsure about. Don't reach for an image/art skill to "fix" the
-  poster; this is a LaTeX document, edited as LaTeX.
-- **Gemini 3.1 Pro / Antigravity (no skill system):** use `build.sh`'s built-in
-  `pdflatex` path and the reference material in this file. The build loop and
-  `check_fit.py` are identical for you.
+All agents (including Claude Code, PAI agents, and Gemini 3.1 Pro / Antigravity) fully support the skill ecosystem and can use the **`latex-document-skill`**. 
+Invoke this skill for any non-trivial LaTeX work (compiling, debugging compile errors, adding figures, tables, TikZ, fonts). `build.sh` attempts to use the skill's `compile_latex.sh` under the hood if available, but read the skill's `SKILL.md` yourself when you need its reference guides (poster design, debugging, packages) or its helper scripts — don't hand-roll LaTeX you're unsure about. Don't reach for an image/art skill to "fix" the poster; this is a LaTeX document, edited as LaTeX.
 
-Either way the rule is the same: edit `irradiation_poster.tex`, build with
-`build.sh`, and don't call it done until `check_fit.py` prints `PASS`.
+The rule is the same: edit `irradiation_poster.tex`, build with `build.sh`, and don't call it done until `check_fit.py` prints `PASS`.
 
 ---
 
@@ -108,10 +116,13 @@ Either way the rule is the same: edit `irradiation_poster.tex`, build with
 ### 3a. tikzposter does NOT auto-fit — overflow is SILENT
 Blocks stack top-down. If a column's content is taller than the page, the last
 card **runs off the bottom edge** — its rounded bottom border and figure caption
-get clipped. **LaTeX reports no error.** The PDF "compiles successfully" and the
-top 90% looks perfect. The only way to catch it is to inspect the *bottom* of
-each column → that is exactly what `check_fit.py` automates. **Never declare the
-layout done without a `PASS`.**
+get clipped. Furthermore, **tables that are too wide will spill horizontally**
+off the right edge of the card, bleeding into the gap between columns or off the
+page entirely. **LaTeX reports no error for vertical overflow**, and only a standard
+`Overfull \hbox` for horizontal overflow. The PDF "compiles successfully" and the
+top 90% looks perfect. The only way to catch it is to inspect the *bottom* and
+*edges* of each column → that is exactly what `check_fit.py` automates.
+**Never declare the layout done without a `PASS`.**
 
 ### 3b. The middle column (col2) is the tight one
 - `col1` (left) usually has large slack (~150px margin).
@@ -157,6 +168,9 @@ with a comfortable margin (aim for WARN-free, i.e. lowest content < ~97.5% down)
 3. **Trim prose.** Preserve the physics facts; cut filler words, not numbers/units.
 4. **Move content between columns or rows** to rebalance the layout.
    *(Note: Do NOT change `blockverticalspace` to fix overflow, as top/bottom margins between cards are absolute. Do NOT shrink figures—images must ALWAYS be `1.0\linewidth`.)*
+5. **If a table overflows horizontally**, it is too wide for the column. Wrap the `tabular`
+   environment in `\resizebox{\linewidth}{!}{ \begin{tabular}... \end{tabular} }`
+   (from the `graphicx` package) so it scales down to fit the column width exactly.
 
 ### Figure aspect ratios (height per unit width — who hogs vertical space)
 | Figure | px | height/width | Note |
@@ -169,8 +183,9 @@ with a comfortable margin (aim for WARN-free, i.e. lowest content < ~97.5% down)
 A wide-and-short figure costs little height even at large width; a near-square
 one costs a lot. Trim by **height impact**, not apparent size.
 
-### Figure widths (1.0 design rule)
+### Figure/Table widths (1.0 design rule)
 Images must ALWAYS be set to `1.0\linewidth` to maximize readability. If a content edit makes col2 overflow, tighten prose first (§4 steps 1–2) or move content. Do not shrink figure widths below `1.0\linewidth`.
+Similarly, tables that are too wide should be scaled down to exactly `1.0\linewidth` using `\resizebox{\linewidth}{!}{ ... }` rather than letting them bleed horizontally.
 
 ---
 
@@ -222,9 +237,10 @@ running to the last pixel row with no margin.
 
 ## 7. House rules
 
-- **Edit only `.tex` files in `build/`** (like `build/drafts/<poster>.tex`) for content/layout. Leave
-  `template/`, `sources/`, `pipeline/`, `venv/` untouched unless explicitly
-  asked to re-run extraction.
+- **`newest-poster.tex` is the canonical poster.** When iterating, edit it.
+  When experimenting with a new layout, create `build/drafts/<name>.tex`.
+- **All new draft `.tex` files go in `build/drafts/`**, not the `build/` root.
+  This keeps root outputs clean (`newest-poster.pdf`, `irradiation_poster.pdf` only).
 - **Do NOT redefine standard macros.** If copying a preamble, do not duplicate `\looseitems` or `\tightitems`. Ensure `\begin{document}` is included.
 - **`pdflatex` engine** (the poster uses `\documentclass{tikzposter}` + plain
   `graphicx`; no fontspec). Two passes. `build.sh` handles it.
@@ -238,11 +254,18 @@ running to the last pixel row with no margin.
 
 ## 8. Creating a new poster version
 
-Copy `build/newest-poster.tex` to a new name (e.g. `build/poster_v2.tex`),
-clear the block bodies, fill in new content, then build with
-`./build.sh poster_v2.tex`. The existing poster has the full preamble,
-LAYOUT PARAMETERS section, all macros, and title-bar setup already wired — it
-is the best starting point for any new poster in this repo.
+Copy `build/newest-poster.tex` to `build/drafts/<name>.tex`,
+clear the block bodies, fill in new content, then build with:
+
+```bash
+cd build
+./build.sh drafts/<name>.tex    # outputs stay inside build/drafts/
+```
+
+`newest-poster.tex` has the full preamble, LAYOUT PARAMETERS, all macros,
+and title-bar setup already wired — it is the best starting point for any
+new poster in this repo. Only promote a draft to `newest-poster.tex` when
+it has a clean `RESULT: PASS` and real content in every block.
 
 **Lesson learned**: a minimal "skeleton passes PASS" is not success. An agent
 that stops as soon as the layout compiles clean has done nothing useful — every
@@ -325,7 +348,7 @@ Column 3 (right):
   "this means that". Every sentence must add physical or technical information.
 - State results with units and uncertainties where known.
   Use thin spaces: `40\,MHz`, `108\,Gy`, `13\times10^{12}\,n_\text{eq}/cm^2`.
-- **Use Tables for Data:** Component test results, pass/fail matrices, and numerical parameter sets MUST be formatted as LaTeX tables (`\begin{tabular}`) to elevate the poster visually. Do not use bulleted lists for tabular data.
+- **Use Tables for Data:** Component test results, pass/fail matrices, and numerical parameter sets MUST be formatted as LaTeX tables (`\begin{tabular}`) to elevate the poster visually. Do not use bulleted lists for tabular data. **Beware of horizontal overflow:** tables do not wrap automatically. If your table is wider than the column, it will bleed horizontally. Wrap your tabular environment in `\resizebox{\linewidth}{!}{ \begin{tabular}... \end{tabular} }` if needed.
 
 ## Style rules (non-negotiable)
 
@@ -335,6 +358,7 @@ Column 3 (right):
   \textcolor{see}{SEE}, \textcolor{sel}{SEL}.
 - Figures: ALWAYS width 1.0\linewidth. Use \captiontext{...} for all captions.
 - Visual Anchors: You must aggressively utilize ALL relevant graphical assets in `build/assets/` to visually anchor columns. Do not produce walls of text.
+- **Unique Assets: Do NOT use the same image, graph, or asset in the poster more than once.** Every figure must be unique.
 - Standard Spacing: Enforce a standard `blockverticalspace=3em` (or `4em` max) in `\documentclass`. Do not inflate this to mask a lack of content.
 - Only reference figures that physically exist in build/assets/.
 
@@ -351,4 +375,60 @@ Column 3 (right):
    unfamiliar with this specific work can learn the key results from the poster
    alone, without referring to the papers.
 ```
+
+---
+
+## 9. Maintenance & archiving (`build/maintenance.py`)
+
+`build.sh` runs housekeeping automatically so the build tree stays clean and
+every build is preserved under a uniform name. You rarely call `maintenance.py`
+by hand — but here is what it does.
+
+### Naming scheme
+
+Archives in `build/drafts/` are named
+
+```
+poster_<NNN>_<YYYYMMDD-HHMMSS>.<ext>
+```
+
+a 3-digit monotonic index (max existing + 1) plus a build timestamp. One
+"bundle" shares the base name across `.pdf`, a `.tex` snapshot of the source it
+was built from, and the preview `_prev/<base>-1.png`. Names sort chronologically
+and never collide.
+
+### What `build.sh` does automatically
+
+After the fit check, for **root builds only** (`newest-poster` /
+`irradiation_poster` — not draft builds, which already live in `drafts/`):
+
+1. **Archives** a copy of the built `.pdf`, its preview, and a snapshot of the
+   `.tex` into `build/drafts/` under the scheme above. The working
+   `newest-poster.pdf` / `_prev/newest-poster-1.png` stay in place, so the
+   inspect-the-preview loop in §2 is unaffected.
+2. **Prunes** to the newest `ARCHIVE_KEEP` (default 20) archives.
+3. **Cleans** LaTeX temp/aux (`.aux .log .out .fls .fdb_latexmk .synctex.gz
+   .nav .snm .toc …`) and scratch crops from `build/` and `build/drafts/`.
+   `_prev/*.png`, `.tex`, `.pdf`, and assets are never touched.
+
+Env toggles: `ARCHIVE=0 ./build.sh` skips archiving (still cleans);
+`ARCHIVE_KEEP=N ./build.sh` changes retention.
+
+### Manual subcommands
+
+```bash
+cd build
+python3 maintenance.py migrate --dry-run     # preview legacy-draft rename plan
+python3 maintenance.py migrate               # rename poster_1/poster_vN_final → scheme
+python3 maintenance.py clean --dry-run       # list temp files that would be removed
+python3 maintenance.py prune --keep 10       # keep only the 10 newest archives
+python3 maintenance.py archive newest-poster.pdf \
+    --preview _prev/newest-poster-1.png --tex newest-poster.tex --move
+```
+
+Every subcommand supports `--dry-run`. `archive` copies by default; `--move`
+relocates the PDF/preview instead. Archived PDFs, previews, and
+`poster_*_*.tex` snapshots are git-ignored (regenerable from the build) — use
+`git add -f` to keep a curated final.
+
 
