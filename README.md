@@ -146,6 +146,20 @@ Treat the generated `.tex` as a draft: a human must review it, confirm
 `check_fit.py` prints `PASS`, and promote it to `newest-poster.tex` before it
 is canonical.
 
+### 7. (Optional) Export an editable PowerPoint deck (PPT Master)
+
+The vendored `skills/ppt-master/` skill turns the source PDFs into a natively
+editable `.pptx` (for talks — not the poster itself):
+
+```bash
+pip install -r requirements-pptx.txt
+python pipeline/pptx_export.py prepare          # PDFs -> Markdown + skeleton
+# ... use the `ppt-master` skill to author slide SVGs into build/pptx/poster/svg_final/ ...
+python pipeline/pptx_export.py export           # SVGs -> build/pptx/poster/exports/*.pptx
+```
+
+SVG authoring is agent-driven, not scripted — see [AGENTS.md §11](AGENTS.md).
+
 ---
 
 ## Directory layout
@@ -156,7 +170,8 @@ is canonical.
 | `sources/pdf/` | The original source PDFs (presentations + papers). |
 | `sources/converted/` | One `Output_<name>/` per source PDF — output of the PDF→LaTeX pipeline. Each holds `<name>_mapped.tex` (extracted text + `\includegraphics` links), `assets/` (extracted figures: png/jpeg/pdf), and `slides/` (each source page burst to a single-page PDF = ground truth). |
 | `template/` | `tile_calibration_poster.tex` — reusable style template for calibration posters (tikzposter, A0 portrait, ATLAS colour scheme). Can be compiled; figure assets are not present in the directory so figures render as placeholder boxes. |
-| `pipeline/` | PDF→LaTeX conversion + QA tooling (`pdf_pipeline.py` and helpers), plus the optional DeerFlow auto-generation pipeline (`deerflow_orchestrator.py`, `generate_poster.py`). |
+| `pipeline/` | PDF→LaTeX conversion + QA tooling (`pdf_pipeline.py` and helpers), plus the optional DeerFlow auto-generation pipeline (`deerflow_orchestrator.py`, `generate_poster.py`) and the PPTX export step (`pptx_export.py`). |
+| `skills/ppt-master/` | Vendored **PPT Master** Claude skill — turns source documents into a natively-editable PPTX deck. See [AGENTS.md §11](AGENTS.md). |
 | `qa/` | Vision-QA reports on extraction fidelity (`verification_report.md/.json`). |
 | `config.yaml` | Model-endpoint config (OpenRouter, NVIDIA NIM) for the auto-pipeline; API keys come from the environment. |
 | `.env` | Live API keys for the auto-pipeline. **Git-ignored — never commit.** |

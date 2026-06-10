@@ -20,6 +20,10 @@ build/*.pdf
 .verify_scratch/
 sources/converted/
 
+# PPTX export output (PPT Master prepare/export — regenerable from sources).
+# The skill itself lives in tracked skills/ppt-master/; only the build output is ignored.
+build/pptx/
+
 # Scratch crops / temp images at repo or build root
 /_*.png
 build/_*.png
