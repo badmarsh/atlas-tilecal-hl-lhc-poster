@@ -1,0 +1,46 @@
+{
+  "summary": {
+    "total_pdfs": 6,
+    "total_slides_checked": 39,
+    "pdfs_with_major_issues": 2,
+    "overall_verdict": "Needs Tuning"
+  },
+  "pdfs": {
+    "ATL-TILECAL-SLIDE-2025-552.pdf": {
+      "slides": 21,
+      "issues": [
+        "Major Issue: Junk assets (UT Arlington logo extracted as image on almost all slides, ATLAS logo on slide 1)",
+        "Minor Issue: Duplicate extractions on some slides"
+      ],
+      "verdict": "Major Issues"
+    },
+    "atlas-eps-converted-to.pdf": {
+      "slides": 1,
+      "issues": [],
+      "verdict": "Pass"
+    },
+    "Eduardo_IEEE_NSS_MIC_RTSD2025_Summary.pdf": {
+      "slides": 2,
+      "issues": [],
+      "verdict": "Pass"
+    },
+    "Eduardo_IEEE_NSS_MIC_RTSD_Poster-2.pdf": {
+      "slides": 1,
+      "issues": [
+        "Major Issue: Junk assets (text blocks like 'Radiation requirements' incorrectly extracted as image assets)",
+        "Minor Issue: Asset duplication and merging (multiple plots merged into one giant asset, while also extracted individually)"
+      ],
+      "verdict": "Major Issues"
+    },
+    "paper_ATL-TILECAL-PROC-2022-017.pdf": {
+      "slides": 6,
+      "issues": [],
+      "verdict": "Pass"
+    },
+    "paper_Valdes_Santurio_2023_J._Inst._18_C04011.pdf": {
+      "slides": 8,
+      "issues": [],
+      "verdict": "Pass"
+    }
+  }
+}

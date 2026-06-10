@@ -1,0 +1,28 @@
+# Python env (1.6 GB, Windows-built; regenerate with: pip install -r requirements.txt)
+venv/
+__pycache__/
+*.pyc
+
+# LaTeX build artifacts
+build/_prev/
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.nav
+*.snm
+*.toc
+
+# QA / extraction scratch (regenerable)
+.verify_scratch/
+
+# Scratch crops / temp images at repo or build root
+/_*.png
+build/_*.png
+/tmp_*
+
+# OS noise
+.DS_Store
+Thumbs.db

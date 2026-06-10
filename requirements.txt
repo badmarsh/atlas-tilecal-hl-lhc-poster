@@ -1,0 +1,9 @@
+surya-ocr
+nougat-ocr
+docling
+PyMuPDF
+pixelmatch
+opencv-python
+layoutparser
+pdf2image
+pdfplumber

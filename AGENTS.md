@@ -1,0 +1,203 @@
+# AGENTS.md — Working rules for the ATLAS TileCal irradiation poster
+
+> Read this fully before touching the poster. It is written for any agent
+> (Claude 4.7, Gemini 3.1 Pro / Antigravity, future Claude) picking up this
+> repo. It encodes hard-won lessons — following it avoids the two failure modes
+> that already bit us: **silent overflow** and **stale previews**.
+
+---
+
+## 1. What this repo is
+
+An A0 **portrait** LaTeX poster built with the `tikzposter` class:
+
+> *Irradiation Studies and Design Optimization of the ATLAS Tile Calorimeter
+> for the High-Luminosity LHC.*
+
+The poster is **3 equal columns** (`\column{0.333}` each). Content is grouped
+into `\block{Title}{ body }` "cards". Most user requests will be **editing the
+text/figures inside a card** — the wording changes often, so the layout must be
+re-checked after *every* content edit.
+
+### File map (only these matter day-to-day)
+
+| Path | What it is |
+|---|---|
+| `build/irradiation_poster.tex` | **The poster. This is the only file you edit.** |
+| `build/assets/` | Figures referenced by the poster (`.png` and `.pdf`). |
+| `build/logos/` | Title-bar logo (`atlas_transparent.png`). |
+| `build/build.sh` | **Compile + preview + overflow check, one command.** Use this. |
+| `build/check_fit.py` | Deterministic overflow detector (called by `build.sh`). |
+| `build/_prev/irradiation_poster-1.png` | Latest rendered preview (regenerated each build). |
+| `template/tile_calibration_poster.tex` | Style/dimension reference only. **Do not compile or edit.** |
+| `sources/` | Original source PDFs + their extracted text/figures. The factual ground truth for card content. |
+| `qa/` | Vision-QA reports on extraction fidelity. |
+
+Everything else (`venv/`, `.verify_scratch/`, `pipeline/`) is the one-time
+PDF→LaTeX extraction toolchain. **You almost never need it.** Do not run or
+modify it for a normal "change the wording / fix the layout" request.
+
+---
+
+## 2. The build loop — do this every time
+
+```bash
+cd build
+./build.sh           # compiles, renders _prev/irradiation_poster-1.png, runs check_fit.py
+```
+
+Then **read the preview image** `build/_prev/irradiation_poster-1.png` and trust
+the `check_fit.py` verdict it prints. A change is not done until:
+
+1. `build.sh` prints `RESULT: PASS`, **and**
+2. you have visually looked at the preview (or the relevant column crop).
+
+If you only have `pdflatex`/`pdftoppm` (no PAI skill), `build.sh` falls back to
+them automatically — it is portable.
+
+### Use your LaTeX tooling/skill
+- **Claude Code / PAI agents:** invoke the **`latex-document-skill`** for any
+  non-trivial LaTeX work (compiling, debugging compile errors, adding figures,
+  tables, TikZ, fonts). `build.sh` already calls that skill's `compile_latex.sh`
+  under the hood, but load the skill yourself when you need its reference guides
+  (poster design, debugging, packages) or its helper scripts — don't hand-roll
+  LaTeX you're unsure about. Don't reach for an image/art skill to "fix" the
+  poster; this is a LaTeX document, edited as LaTeX.
+- **Gemini 3.1 Pro / Antigravity (no skill system):** use `build.sh`'s built-in
+  `pdflatex` path and the reference material in this file. The build loop and
+  `check_fit.py` are identical for you.
+
+Either way the rule is the same: edit `irradiation_poster.tex`, build with
+`build.sh`, and don't call it done until `check_fit.py` prints `PASS`.
+
+---
+
+## 3. Gotchas (these already cost us time — do not relearn them)
+
+### 3a. tikzposter does NOT auto-fit — overflow is SILENT
+Blocks stack top-down. If a column's content is taller than the page, the last
+card **runs off the bottom edge** — its rounded bottom border and figure caption
+get clipped. **LaTeX reports no error.** The PDF "compiles successfully" and the
+top 90% looks perfect. The only way to catch it is to inspect the *bottom* of
+each column → that is exactly what `check_fit.py` automates. **Never declare the
+layout done without a `PASS`.**
+
+### 3b. The middle column (col2) is the tight one
+- `col1` (left) usually has large slack (~150px margin).
+- `col3` (right) is moderately full.
+- `col2` (middle) has 3 dense cards + 3 figures and overflows first.
+
+So: **put new/longer content in col1 when you have the choice**, and after *any*
+col2 edit, assume it overflowed until `check_fit.py` says otherwise.
+
+### 3c. A locked PDF causes STALE previews (insidious)
+If `irradiation_poster.pdf` is open in a viewer (Acrobat, browser, SumatraPDF on
+Windows), `pdflatex` fails with `! I can't write on file ... .pdf` →
+`Fatal error occurred, no output PDF file produced`. The **old** preview stays
+on disk, so you "fix" things and see no change and conclude you're blind. You're
+not — the build never ran. `build.sh` deletes the PDF first to prevent this, but
+if you compile by hand, **`rm -f irradiation_poster.pdf` before every build**,
+and keep the PDF closed in viewers while iterating.
+
+### 3d. Don't eyeball a downscaled A0 at a glance
+The preview is ~849×1200 for a ~841×1189 mm page — a rounded card border vs. a
+clip is a few pixels. We wrongly called it "fixed" twice by eye. **Measure**
+(`check_fit.py`) or crop-and-zoom the exact region (see §6) before concluding.
+
+---
+
+## 4. Fixing overflow — reclaim vertical space in this order
+
+Apply to the **offending column only** (almost always col2). Prefer the earlier,
+less destructive levers first; stop as soon as `check_fit.py` returns `PASS`
+with a comfortable margin (aim for WARN-free, i.e. lowest content < ~97.5% down).
+
+1. **Tighten item spacing.** In that column's blocks change
+   `\setlength{\itemsep}{0.3em}` → `0.15em`. Cheap, invisible, big payoff.
+2. **Reduce inter-figure / pre-caption space.** `\vspace{0.12cm}` before a
+   figure → `0.08cm` or `0cm`; make the post-figure `\vspace{-0.2cm}` more
+   negative (`-0.3cm`).
+3. **Reduce `blockverticalspace`** in the `\documentclass[...]` options (affects
+   all columns; fine because col1/col3 have slack).
+4. **Shrink figures** via the `width=0.NN\linewidth` fraction — **last resort**,
+   because these are data plots that must stay readable. Shrink the *tallest*
+   figure first (largest height = width × (img_height/img_width); see ratios
+   below), not necessarily the biggest on screen.
+5. **Trim prose.** Only if the above isn't enough. Preserve the physics facts;
+   cut filler words, not numbers/units.
+
+### Figure aspect ratios (height per unit width — who hogs vertical space)
+| Figure | px | height/width | Note |
+|---|---|---|---|
+| `fig_db6_blockdiagram.png` | 904×553 | **0.61** | tallest in col2; shrink this first |
+| `fig_minidrawer_blockdiagram.png` | 992×336 | 0.34 | col1 |
+| `fig_mosfet_threshold.png` | 1160×367 | 0.32 | col2 bottom |
+| `fig_db6_tid_test.png` | 1091×299 | 0.27 | col2 middle; very wide/short |
+
+A wide-and-short figure costs little height even at large width; a near-square
+one costs a lot. Trim by **height impact**, not apparent size.
+
+### Known-good col2 figure widths (the current PASS state)
+`fig_db6_blockdiagram` `0.60`, `fig_db6_tid_test` `0.56`,
+`fig_mosfet_threshold` `0.46`, with `\itemsep` `0.15em` in all three col2 blocks.
+If a content edit makes col2 overflow again, start from these and nudge.
+
+---
+
+## 5. Editing card contents (the common request)
+
+When the user asks to change what a card says:
+
+1. **Find the card** by its `\block{Title}{...}` title in
+   `build/irradiation_poster.tex`.
+2. **Keep the physics correct.** Cross-check dose/fluence/efficiency numbers
+   against `sources/` (the papers/slides), not from memory. Units use
+   `\,` thin spaces (e.g. `40\,MHz`, `108\,Gy`).
+3. **Preserve the visual grammar:**
+   - Radiation-effect terms use the defined colour macros:
+     `\textcolor{tid}{...}` (orange), `\textcolor{niel}{...}` (green),
+     `\textcolor{see}{...}` / `\textcolor{sel}{...}` (red/blue). Reuse them;
+     don't invent new colours.
+   - Bullet lists are `\begin{itemize}\setlength{\itemsep}{0.15em} ... \end{itemize}`.
+   - Each figure sits in a `\begin{center}...\end{center}` followed by a
+     `{\small caption}`.
+4. **Escape LaTeX specials in prose:** `%`→`\%`, `&`→`\&`, `_`→`\_`, `#`→`\#`,
+   `$`→`\$`. Angle brackets need math mode: `<5\%` → `$<5\%$`, `≥` → `$\geq$`.
+   These compile silently wrong otherwise (inverted `¿` glyphs).
+5. **Rebuild and check** (`./build.sh`). If the edit lengthened a col2 card →
+   it likely overflowed → §4.
+6. If a card grew a lot, consider **moving a card between columns** to rebalance
+   rather than shrinking everything (col1 has the most room).
+
+---
+
+## 6. Verifying a specific region by eye
+
+`check_fit.py` tells you *whether* it fits. To *see* a region, crop the preview
+(don't squint at the whole A0):
+
+```bash
+cd build
+# bottom of the middle column, zoomed 2.5x:
+convert _prev/irradiation_poster-1.png -crop 320x180+265+1030 -resize 250% /tmp/crop.png
+# columns are roughly: col1 x≈0..283, col2 x≈283..566, col3 x≈566..849 (of 849 wide)
+```
+
+A correctly closed card shows: caption text → a solid rounded **red** bottom
+border → white margin → page edge. A clipped card shows pink body / border
+running to the last pixel row with no margin.
+
+---
+
+## 7. House rules
+
+- **Edit only `build/irradiation_poster.tex`** for content/layout. Leave
+  `template/`, `sources/`, `pipeline/`, `venv/` untouched unless explicitly
+  asked to re-run extraction.
+- **`pdflatex` engine** (the poster uses `\documentclass{tikzposter}` + plain
+  `graphicx`; no fontspec). Two passes. `build.sh` handles it.
+- **Keep the PDF closed in viewers while iterating** (see §3c).
+- **One source of truth for "does it fit": `check_fit.py` → `PASS`.** Don't
+  declare success on a green LaTeX compile alone.
+- Don't commit/regenerate `venv/`, `_prev/`, or LaTeX aux files — see
+  `.gitignore`.

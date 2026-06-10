@@ -1,0 +1,349 @@
+%
+%\usepackage{graphicx}
+%\usepackage{amsmath}
+%\usepackage{amssymb}
+%\usepackage{physics}
+%\usepackage{hyperref}
+%
+%\usepackage{epstopdf}
+%\usepackage[absolute,overlay]{textpos}
+%
+%\definecolor{maincolor}{HTML}{9e2b2f}
+%\definecolor{secondarycolor}{RGB}{158, 43, 47}
+%\definecolor{lightred}{RGB}{237, 199, 201}
+%
+%\definecolor{cesium}{RGB}{254,128,2}
+%\definecolor{laser}{RGB}{254,2,0}
+%\definecolor{cis}{RGB}{190,0,62}
+%\definecolor{green}{RGB}{0,140,0}
+%\definecolor{turquoise}{RGB}{0,170,170}
+%
+%% Theme settings
+%\usetheme{Madrid}
+%\usecolortheme{default}
+
+%\setbeamercolor{structure}{fg=maincolor}
+%\setbeamercolor{title}{fg=white,bg=maincolor}
+%\setbeamercolor{frametitle}{fg=white,bg=maincolor}
+%\setbeamercolor{block title}{fg=white,bg=maincolor}
+%\setbeamercolor{block body}{fg=black,bg=lightred!40}
+%\setbeamercolor{itemize item}{fg=maincolor}
+%\setbeamercolor{enumerate item}{fg=maincolor}
+%
+%\setbeamertemplate{navigation symbols}{}
+%\setbeamertemplate{footline}[frame number]
+%
+%% Title information
+%\title{Performance and calibration of the ATLAS Tile Calorimeter}
+%\author{Róbert Astaloš\\on behalf of the ATLAS Collaboration}
+%\institute{Comenius University Bratislava}
+%\date{24 March - 28 March 2025, Cape Town, South Africa\\\vspace{0.3cm}
+%The XXXII International Workshop on Deep Inelastic Scattering and Related Subjects (DIS2025)}
+
+\documentclass[a0paper,portrait, blockverticalspace=3em, colspace=2em]{tikzposter}
+\tikzposterlatexaffectionproofoff
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{physics}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{epstopdf}
+\usepackage{multicol}
+\usepackage[absolute,overlay]{textpos}
+
+% Define ATLAS color scheme
+\definecolor{maincolor}{HTML}{9e2b2f}
+\definecolor{secondarycolor}{RGB}{158, 43, 47}
+\definecolor{lightred}{RGB}{237, 199, 201}
+
+% Special colors for calibration systems
+\definecolor{cesium}{RGB}{254,128,2}
+\definecolor{laser}{RGB}{254,2,0}
+\definecolor{cis}{RGB}{190,0,62}
+\definecolor{green}{RGB}{0,140,0}
+\definecolor{turquoise}{RGB}{0,170,170}
+
+% Set tikzposter theme 
+\usetheme{Default}
+
+% Override default colors with ATLAS colors
+\definecolorstyle{atlascolors}{
+    \colorlet{backgroundcolor}{white}
+    \colorlet{titlefgcolor}{white}
+    \colorlet{titlebgcolor}{maincolor}
+    \colorlet{blocktitlefgcolor}{white}
+    \colorlet{blocktitlebgcolor}{maincolor}
+    \colorlet{blockbodyfgcolor}{black}
+    \colorlet{blockbodybgcolor}{lightred!25}
+}{
+    % This is needed for the colorstyle definition but can be empty
+}
+\usecolorstyle{atlascolors}
+\newcommand\semihuge{\@setfontsize\semihuge{18.93}{23.45}}
+
+\definetitlestyle{sampletitle}{width=600mm, roundedcorners=20, linewidth=2pt, innersep=5pt,
+titletotopverticalspace=15mm, titletoblockverticalspace=20mm}{\begin{scope}[line width=\titlelinewidth, rounded corners=\titleroundedcorners] \draw[color=blocktitlebgcolor, fill=titlebgcolor](\titleposleft,\titleposbottom) rectangle (\titleposright,\titlepostop);
+\end{scope}}
+
+\usetitlestyle{sampletitle}
+
+% Title settings
+\title{\huge Performance and calibration of the ATLAS Tile Calorimeter }
+\author{Róbert Astaloš\\\vspace{0.5cm}}
+\institute{Presented on DIS2025 in Cape Town on 26th of March 2025}
+\date{}
+
+
+% Reduce spacing between blocks and columns
+\setlength{\columnsep}{0.5cm}
+%\setlength{\blockverticalspace}{0.5cm}
+
+\begin{document}
+
+\maketitle
+\begin{textblock*}{5cm}(73.5cm,1.5cm) % {block width} (coords)
+\includegraphics[width=8.cm]{atlas.eps}
+\end{textblock*}
+
+%\begin{textblock*}{5cm}(0.6cm,3.6cm) % {block width} (coords)
+%\includegraphics[width=1.9cm]{uk_logo_BP_Eng.png}
+\begin{textblock*}{5cm}(-1.cm,-2.7cm) % {block width} (coords)
+\includegraphics[width=14.3cm]{uk_logo_text_BP_vertical_Eng.png}
+\end{textblock*}
+
+
+% Three-column layout with reduced spacing
+\begin{columns}
+    \column{0.333333}
+    \block{Tile Calorimeter}{
+        \begin{itemize}\setlength{\itemsep}{0.5em}
+            \item Central hadronic calorimeter of the ATLAS detector covering $|\eta| < 1.7$
+            \item Identification and energy measurements of hadrons, jets, tau leptons decaying hadronically and missing transverse energy, 
+            \\resolution of $\sigma_\mathrm{E} / E = 56.4\%/\sqrt{E\mathrm{(GeV)}}\oplus5.5\%$
+            %\item Provides inputs for the L1Calo Trigger and muon identification
+            \item 4 partitions: 2 halves of central long barrel (LB) \\and 2 extended barrels (EB)
+            \item Modules: plastic scintillating tiles as active medium and steel plates as absorber
+        \end{itemize}
+        
+        \vspace{0.3cm}
+        \begin{center}
+            \includegraphics[width=0.64\linewidth]{plots/plot1.pdf}
+            \includegraphics[width=0.34\linewidth]{plots/plot2.pdf}
+        \end{center}
+        \begin{itemize}\setlength{\itemsep}{0.5em}
+            \item Light produced by particles passing through scintillating tiles transmitted to photomultipliers (PMTs) via the Wavelength-shifting fibres
+            \item Radial direction: readout cells divided into 3 layers in LB (A, BC, and D) and 3 layers in EB (A, B, and D)
+            \item Azimuthal direction: 64 modules in each barrel
+            \item Typically, 2 PMTs (channels) for a given readout cell (total of 9852 channels, 5182 cells)
+            \item Signals divided into 2 branches: low gain (LG) and high gain (HG) and amplified with a relative ratio of 1:64
+        \end{itemize}
+        
+        \vspace{0.3cm}
+        \begin{center}
+            \includegraphics[width=0.95\linewidth]{plots/plot3.pdf}
+        \end{center}
+    }
+    
+%\block{Signal Reconstruction}{
+%        \begin{itemize}\setlength{\itemsep}{0.5em}
+%            \item PMT signal shaped and digitized in the front-end readout electronics
+%            \item Signals divided into two branches: low gain (LG) and high gain (HG) and amplified with a relative ratio of 1:64
+%            \item Signal pulse sampled every 25 ns using a 10-bit ADC 
+%            \item Signal amplitude reconstructed from 7 samples with optimal filtering (OF) algorithm in units of ADC counts, parameters: amplitude (A), time (t), pedestal (P):
+%        \end{itemize}
+%        \vspace{-0.3cm}
+%        $$A = \sum_{i=1}^{7} a_i \cdot S_i, \;\; t = \frac{1}{A}\sum_{i=1}^{7} b_i \cdot S_i, \;\; P = \sum_{i=1}^{7} c_i \cdot S_i$$
+%        
+%        where $S_i$ is the readout of sample $i$ and \\
+%        $a_i$, $b_i$, $c_i$ are coefficients optimized using test beam data to minimize electronic noise.
+%        
+%        \vspace{0.3cm}
+%        \begin{center}
+%            \includegraphics[width=0.58\linewidth]{plots/plot4.pdf}
+%        \end{center}
+%    }
+    
+\block{Calibration Systems}{
+\vspace{-0.25cm}
+    \begin{center}
+            \includegraphics[width=1.\linewidth]{plots/plot5.pdf}
+        \end{center}
+        Various calibration systems to calibrate each step of the TileCal cell energy reconstruction:
+        \vspace{0.2cm}
+        
+        \begin{itemize}\setlength{\itemsep}{0.5em}
+            \item \textbf{\textcolor{cesium}{Cesium System}} - performed on a monthly basis
+            \begin{itemize}
+                \item $^{137}$Cs capsule hydraulically driven through all tiles
+                \item Calibrates variations of the entire readout chain (optical components and PMTs)
+            \end{itemize}
+            
+            \item \textbf{\textcolor{laser}{Laser System}} - updated every 2 weeks
+            \begin{itemize}
+                \item Short laser pulses simultaneously sent to all PMTs
+                \item Calibrates variations due to electronics and PMTs
+            \end{itemize}
+            
+            \item \textbf{\textcolor{cis}{Charge Injection System (CIS)}} - updated monthly
+            \begin{itemize}
+                \item Known charge injected into readout electronics, calibrates the response of ADCs
+            \end{itemize}
+            
+            \item \textbf{\textcolor{green}{Minimum Bias system}} - updated yearly
+            \begin{itemize}
+                \item Uses minimum-bias $pp$ collisions for the cells most exposed to radiation
+            \end{itemize}
+        \end{itemize}
+        
+        \vspace{0.3cm}
+        $\textcolor{turquoise}{C_{\text{pC}\rightarrow\text{GeV}}}$ determined by measuring the response to electrons in test beam campaigns $\rightarrow$ EM scale with a nominal value of 1.05 pC/GeV
+        
+        \vspace{0.3cm}
+        \begin{center}
+        \Large{
+         $E \text{ [GeV]} = \frac{A\text{[ADC]}}{\textcolor{cis}{C_{\text{ADC}\rightarrow\text{pC}}} \times \textcolor{turquoise}{C_{\text{pC}\rightarrow\text{GeV}}} \times \textcolor{cesium}{C_{\text{Cs}}} \times \textcolor{green}{C_{\text{MB}}} \times \textcolor{laser}{C_{\text{Las}}}}$
+         }
+        \end{center}
+    }    
+    
+    \column{0.333333}
+    
+    \block{Cesium System}{
+        \begin{itemize}\setlength{\itemsep}{0.5em}
+            \item Hydraulic system moves $^{137}$Cs capsule (radioactive $\gamma$-source with $E_{\gamma} = 0.662$ MeV) through the calorimeter system measuring the response of every single tile
+            \item Signals readout by a dedicated integrator system
+            \item For typical cells the precision $\sim 0.3\%$
+            \item Down-drifts in the response variation: degradation in the fibers, scintillating tiles, and PMTs
+            \item Highest degradation for A layer cells as they are closest to the beam pipe
+            \item PMTs recovery in the periods without $pp$ collisions
+        \end{itemize}
+        
+        \begin{center}
+            \includegraphics[width=0.49\linewidth]{plots/plot6.png}
+            \includegraphics[width=0.49\linewidth]{plots/plot6a.png}
+        \end{center}
+    }
+    
+    \block{Laser System}{
+        \begin{itemize}\setlength{\itemsep}{0.5em}
+            \item Single laser source: short 10 ns light pulses with \\$\lambda=$ 532 nm simultaneously distributed to all PMTs
+            \item Precision of the laser calibration at the level of $\sim0.5\%$
+            \item Better stability in time observed for the demonstrator module
+        \end{itemize}
+        
+        \begin{center}
+            \includegraphics[width=0.49\linewidth]{plots/plot8.pdf}
+            \includegraphics[width=0.49\linewidth]{plots/plot8a.pdf}
+        \end{center}
+    }
+    
+    \block{Charge Injection System}{
+            \begin{itemize}
+                \item Injects a well-defined charge signal to the readout electronics covering the full dynamic range
+                \item Determines $\textcolor{cis}{C_{\text{ADC}\rightarrow\text{pC}}}$ conversion constant from sample amplitude (ADC counts) to charge units (pC)
+                \item Precision of the CIS calibration at the level of $\sim0.7\%$
+                \item Very stable over time
+            \end{itemize}
+            
+            \begin{center}
+                \includegraphics[width=0.49\linewidth]{plots/plot11.png}
+                \includegraphics[width=0.49\linewidth]{plots/plot12.png}
+            \end{center}
+            }
+            
+    
+    \block{Minimum Bias System}{
+            \begin{itemize}
+                \item Inelastic $pp$ collisions with low momentum transfer
+                \item Minimum bias events produce a PMT current proportional to the LHC luminosity
+                \item Signal readout by the same integrator system as used by Cesium calibration
+                \item Degradation studies of cells in the gap region (E cells) inaccessible to the cesium system
+                \item Precision of the calibration at the level of $\sim1.2\%$
+            \end{itemize}
+
+            \vspace{5pt}
+            \begin{center}
+                \includegraphics[width=0.49\linewidth]{plots/plot13.pdf}
+                \includegraphics[width=0.49\linewidth]{plots/plot13a.pdf}
+            \end{center}
+            
+    }
+\column{0.333333}    
+    
+\block{Demonstrator Module}{
+            \begin{itemize}
+                \item Fully inserted in TileCal Module LBA14 at the end of July 2019
+                \item Full Long Barrel super-drawer with new electronics and analog trigger, operating with backward compatibility with the current ATLAS DAQ
+                %\item Operating with backward compatibility with the current ATLAS DAQ
+                \item Laser calibration: better stability in time compared to legacy modules
+                \item CIS calibration: good stability over time
+            \end{itemize}
+            
+            \begin{center}
+                \includegraphics[width=0.49\linewidth]{plots/plot8b.pdf}
+                \includegraphics[width=0.49\linewidth]{plots/plot8c.pdf}
+                \includegraphics[width=0.49\linewidth]{plots/plot102.png}
+                \includegraphics[width=0.49\linewidth]{plots/plot103.png}
+            \end{center}
+    }
+    
+\block{Isolated Muons - Energy Response}{
+            \begin{itemize}
+                \item Isolated muons produced in $W \rightarrow \mu\nu$ decays from $pp$ collisions used for calorimeter performance tests
+               % \item Uniformity and stability of the cells' response and the EM scale setting checks
+               % \item Energy loss per unit path close to the minimum ionizing level $\rightarrow$ muon is an ideal particle to scan the entire TileCal volume
+                \item Energy Response: ratio of data and MC for the truncated mean of the $\Delta E/\Delta x$ (muon energy loss per unit distance) calculated without considering 1\% of events in the upper tail
+                \vspace{-0.4cm}
+                \begin{equation}
+                  R = \frac{\langle\Delta E/\Delta x\rangle_{F=1\%}^{\text{Data}}}{\langle\Delta E/\Delta x\rangle_{F=1\%}^{\text{MC}}}\nonumber
+                \end{equation}
+                
+                \item Response uniformity in azimuthal direction measured by fitting the double ratio distribution to a Gaussian likelihood function:
+                \begin{equation}
+                  \mathcal{L} = \prod_{m=1}^{64} \frac{1}{\sqrt{2\pi\sqrt{\sigma_m^2 + s^2}}} \exp\left[-\frac{1}{2}\frac{(R_m - \mu)^2}{\sigma_m^2 + s^2}\right]\nonumber
+                \end{equation}
+                
+                $\mu$ - average energy response,\\
+                $s$ - non-uniformity estimator
+                \item Good uniformity across azimuthal modules (on average $\sim 2.6\%$ for 2022 data and $\sim 2.2\%$ for 2023 data)
+            \end{itemize}
+            
+
+            
+            \begin{center}
+                %\includegraphics[width=0.9\linewidth]{plots/plot14.pdf}
+                \includegraphics[width=0.48\linewidth]{plots/plot15.pdf}
+                \includegraphics[width=0.5\linewidth]{plots/plot16.pdf}
+                %\includegraphics[width=0.49\linewidth]{plots/plot17.pdf}
+            \end{center}
+    }    
+    
+    \block{Time Performance}{
+            \begin{itemize}
+                \item Using reconstructed jets with $p_\mathrm{T}>$ 20 GeV
+                \item Mean cell time decreases with cell energy due to less neutrons and slow hadronic components of shower 
+                \item Transition between high and low gain at $\sim 22$ GeV
+                \item Cell time resolution: $\sigma$ of a Gaussian fit of a timing distribution in a given energy slice  
+                \item Worse resolution for the extended barrel due to larger cell size and for outermost D-layer
+                \item Resolution better than 1 ns for cell energy $>$ 4 GeV
+            \end{itemize}
+            
+            \begin{center}
+                \includegraphics[width=1.\linewidth]{plots/plot19.pdf}
+            \end{center}
+    }    
+    
+%\block{References}{
+%    \begin{enumerate}
+%        \item ATLAS Collaboration, Operation and performance of the ATLAS tile calorimeter in LHC Run 2, \\\url{https://arxiv.org/abs/2401.16034} 
+%        
+%        \item Public plots for the Tile Calorimeter:\\
+%        \url{https://twiki.cern.ch/twiki/bin/view/AtlasPublic/ApprovedPlotsTile}
+%        
+%        \item Public plots for the Tile Calorimeter (Collision Data):\\
+%        \url{https://twiki.cern.ch/twiki/bin/view/AtlasPublic/TileCaloPublicResults}
+%    \end{enumerate}
+%}    
+\end{columns}
+\end{document}
