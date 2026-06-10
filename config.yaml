@@ -1,0 +1,20 @@
+models:
+  # OpenRouter Endpoint Configuration
+  - name: openrouter-claude-3-5
+    display_name: "OpenRouter (Claude 3.5 Sonnet)"
+    use: langchain_openai:ChatOpenAI
+    model: "anthropic/claude-3.5-sonnet" # You can change this to any OpenRouter model
+    api_key: $OPENROUTER_API_KEY
+    base_url: "https://openrouter.ai/api/v1"
+    max_tokens: 4096
+    temperature: 0.0
+
+  # NVIDIA NIM Endpoint Configuration
+  - name: nvidia-llama-3-1
+    display_name: "NVIDIA NIM (Llama 3.1)"
+    use: langchain_openai:ChatOpenAI
+    model: "meta/llama-3.1-8b-instruct" # Change to your preferred NIM model
+    api_key: $NVIDIA_API_KEY
+    base_url: "https://integrate.api.nvidia.com/v1"
+    max_tokens: 4096
+    temperature: 0.0

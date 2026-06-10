@@ -7,3 +7,5 @@ opencv-python
 layoutparser
 pdf2image
 pdfplumber
+deerflow
+

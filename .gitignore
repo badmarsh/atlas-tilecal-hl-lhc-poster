@@ -25,6 +25,14 @@ sources/converted/
 build/_*.png
 /tmp_*
 
+# Secrets — never commit API keys
+.env
+.env.*
+
+# Local agent / tooling state
+.claude/
+.python-version
+
 # OS noise
 .DS_Store
 Thumbs.db
