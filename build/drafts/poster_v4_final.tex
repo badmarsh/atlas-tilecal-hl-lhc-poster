@@ -1,0 +1,273 @@
+% =============================================================================
+%  Irradiation Studies and Design Optimization of the ATLAS Tile Calorimeter
+%  for the High-Luminosity LHC
+% =============================================================================
+
+\documentclass[a0paper,portrait, blockverticalspace=4em, colspace=2em]{tikzposter}
+\tikzposterlatexaffectionproofoff
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{multicol}
+\usetikzlibrary{calc}
+
+\definecolor{maincolor}{HTML}{9e2b2f}
+\definecolor{secondarycolor}{RGB}{158, 43, 47}
+\definecolor{lightred}{RGB}{237, 199, 201}
+
+\definecolor{tid}{RGB}{254,128,2}   % orange
+\definecolor{niel}{RGB}{0,140,0}    % green
+\definecolor{see}{RGB}{190,0,62}    % red
+\definecolor{sel}{RGB}{0,90,170}    % blue
+
+\newcommand{\looseitems}{\small\begin{itemize}\setlength{\itemsep}{0.3em}}
+\newcommand{\tightitems}{\small\begin{itemize}\setlength{\itemsep}{0.15em}}
+\newcommand{\captiontext}[1]{{\footnotesize\renewcommand{\baselinestretch}{0.88}\selectfont#1}}
+
+\usetheme{Default}
+\definecolorstyle{atlascolors}{
+    \colorlet{backgroundcolor}{white}
+    \colorlet{titlefgcolor}{white}
+    \colorlet{titlebgcolor}{maincolor}
+    \colorlet{blocktitlefgcolor}{white}
+    \colorlet{blocktitlebgcolor}{maincolor}
+    \colorlet{blockbodyfgcolor}{black}
+    \colorlet{blockbodybgcolor}{lightred!25}
+}{}
+\usecolorstyle{atlascolors}
+
+\definetitlestyle{sampletitle}{width=760mm, roundedcorners=20, linewidth=2pt, innersep=10pt, titletotopverticalspace=6mm, titletoblockverticalspace=8mm}{
+  \begin{scope}[line width=\titlelinewidth, rounded corners=\titleroundedcorners]
+    \draw[color=blocktitlebgcolor, fill=titlebgcolor] (\titleposleft,\titleposbottom) rectangle (\titleposright,\titlepostop);
+  \end{scope}
+  \node[anchor=east, fill=white, rounded corners=10pt, inner sep=10pt, xshift=-22mm] at ($(\titleposright,\titlepostop)!0.5!(\titleposright,\titleposbottom)$) {\includegraphics[height=8.6cm]{logos/atlas_transparent.png}};
+}
+\usetitlestyle{sampletitle}
+
+\title{\parbox{0.75\linewidth}{\textbf{Component-Level Qualification Results\\[2mm]of the ATLAS Tile Calorimeter for the HL-LHC}}}
+\author{ATLAS Collaboration}
+\institute{Stockholm University, CERN}
+
+\begin{document}
+\maketitle[width=0.95\textwidth]
+
+\begin{columns}
+
+% ===========================================================================
+\column{0.333}
+
+\block{Introduction \& HL-LHC Upgrade}{
+    \looseitems
+        \item The ATLAS Tile Calorimeter (TileCal) upgrade is absolutely critical for managing the unprecedented radiation levels and the significantly increased pileup anticipated during the High-Luminosity LHC (HL-LHC) era.
+        \item The legacy electronics are being entirely replaced to ensure flawless and continuous operation for the full 10-year lifespan of the upgrade, managing approximately $\sim$35\,Tbps of data across 5376 high-speed optical links.
+        \item A central and critical hub of this architecture is the \textbf{Link \& Control Daughterboard (DB6)}. It interfaces up to 12 PMT channels via a complex 400-pin FMC connector directly to the off-detector systems.
+    \end{itemize}
+}
+
+\block{Daughterboard (DB6) Architecture}{
+    \looseitems
+        \item System redundancy is heavily prioritized: two functionally-equivalent and independent halves utilize \textbf{Triple Modular Redundancy (TMR)} and Xilinx \textbf{Soft Error Mitigation (SEM)} IP to correct soft errors on the fly.
+        \item The DB6 incorporates carefully selected commercial-off-the-shelf (COTS) Kintex UltraScale (KU) and Microsemi ProASIC3 FPGAs, seamlessly integrated with CERN's custom radiation-hard GBTx ASICs.
+    \end{itemize}
+    \vspace{0.12cm}
+    \begin{center}
+        \includegraphics[width=1.0\linewidth]{assets/fig_db6_blockdiagram.png}
+    \end{center}
+    \vspace{-0.2cm}
+    \captiontext{Detailed DB6 architecture showing redundancy layers, FPGAs, GBTx ASICs, and optical links.}
+}
+
+\block{Front-End Minidrawer Integration}{
+    \looseitems
+        \item The DB6 interfaces with up to four Minidrawers, handling 12 PMT signals each.
+        \item It provides high-precision clock distribution and gathers digital data from the ADCs.
+    \end{itemize}
+}
+
+\block{Single Event Upset (SEU) Rates}{
+    \looseitems
+        \item KU FPGAs were irradiated with 54\,MeV protons up to $2.2\times10^{11}$\,p/cm$^2$, exhibiting an SEU rate of 116\,SEU/($10^9$\,p/cm$^2$).
+        \item In a worst-case scenario, this yields roughly \textbf{5498 SEUs per year}.
+        \item \textbf{Mitigation}: Approximately 5487 of these are correctable by SEM and will not impact nominal runs due to TMR.
+        \item The remaining 11 uncorrectable errors per year are managed by TMR and cleared by reloading the FPGA configuration from FLASH during data acquisition stops.
+    \end{itemize}
+    \vspace{0.12cm}
+    \begin{center}
+        \includegraphics[width=1.0\linewidth]{assets/fig_diodes_niel_test.pdf}
+    \end{center}
+    \vspace{-0.2cm}
+    \captiontext{Diode forward voltage shifts under NIEL testing.}
+}
+
+\block{References}{
+    \small
+    \begin{enumerate}\setlength{\itemsep}{0.2em}
+        \item ATLAS Collaboration, \emph{Technical Design Report for the Phase-II Upgrade of the ATLAS Tile Calorimeter}, CERN-LHCC-2017-019 (2018).
+        \item E. Valdes \textit{et al.}, \emph{Radiation studies on the ATLAS Link and Control Daughterboard}, IEEE NSS MIC RTSD (2025).
+        \item E. Valdes \textit{et al.}, \emph{Radiation studies performed on the High-Luminosity ATLAS TileCal link Daughterboard}, JINST \textbf{18} (2023) C04011.
+    \end{enumerate}
+}
+
+% ===========================================================================
+\column{0.333}
+
+\block{Simulated Radiation Environment}{
+    \looseitems
+        \item Radiation qualifications incorporate standard ATLAS collaboration safety factors: 1.5 for simulation uncertainties, and 3.0 to account for lot-to-lot variations (specifically for TID/SEE).
+        \item \textbf{\textcolor{tid}{TID Requirement}}: A minimum 108\,Gy threshold is mandated for all active DB6 components.
+        \item \textbf{\textcolor{niel}{NIEL Requirement}}: The baseline is set to $13.16\times10^{12}$\,n/cm$^2$, which already incorporates an additional safety factor of 1.3 to compensate for the use of non-monoenergetic testing sources.
+        \item \textbf{\textcolor{see}{SEE Requirement}}: A rigorous $4.54\times10^{11}$\,h/cm$^2$ expected fluence limit to ensure negligible data corruption.
+    \end{itemize}
+}
+
+\block{SFP+ Optical Transceiver Matrix}{
+    \tightitems
+        \item Reliable, high-bandwidth data transmission at 9.6\,Gbps is absolutely critical for the readout system. 
+        \item SFP+ components were evaluated under severe \textcolor{niel}{NIEL} conditions. Out of four tested variants, only two passed the mandatory $14\times10^{12}$\,n/cm$^2$ target.
+        \item Additional \textcolor{tid}{TID} and \textcolor{sel}{SEL} testing needs to be carried out on the qualified SFP+ variants before their final integration into the DB6 production design.
+    \end{itemize}
+    \vspace{0.3cm}
+    \begin{center}
+    \small
+    \begin{tabular}{l l c}
+    \hline\hline
+    \textbf{SFP+ Model} & \textbf{TID / NIEL Exposure Limit} & \textbf{Status} \\
+    \hline
+    AVAGO AFBR-709SMZ & Failed during early irradiation & \textcolor{red}{Rejected} \\
+    CORETEK CT-A000NPP & 1/9 units failed @ $9\times 10^{12}$ & \textcolor{red}{Rejected} \\
+    Direktronik 33-4248 & Passed 21$\times10^{12}$\,n/cm$^2$, $>$200\,Gy & \textcolor{niel}{Qualified} \\
+    FS-Europe SFP-10GSR & Passed 21$\times10^{12}$\,n/cm$^2$, $>$200\,Gy & \textcolor{niel}{Qualified} \\
+    \hline\hline
+    \end{tabular}
+    \end{center}
+}
+
+\block{Oscillator Breakdown \& Assessment}{
+    \tightitems
+        \item Timing components were exposed to extended radiation profiles to test long-term frequency stability and phase decoupling effects.
+        \item The LTC6902IMS exhibited inconsistent post-irradiation behavior across the tested sample set, leading to its disqualification.
+    \end{itemize}
+    \vspace{0.3cm}
+    \begin{center}
+    \small
+    \begin{tabular}{p{0.35\linewidth} p{0.3\linewidth} p{0.15\linewidth}}
+    \hline\hline
+    \textbf{Component} & \textbf{Test Outcome} & \textbf{Status} \\
+    \hline
+    LTC6902IMS QUAD & 4/15 units failed outright & \textcolor{red}{Removed} \\
+    540BAA100M000BBG & Passed all stress tests & \textcolor{niel}{Qualified} \\
+    \hline\hline
+    \end{tabular}
+    \end{center}
+}
+
+\block{MOSFET Shifts \& SEL Mitigation}{
+    \tightitems
+        \item The originally selected FDFMA3N109 MOSFETs displayed notable threshold voltage shifts. These shifts were directly correlated to the \textbf{195\,Gy} Gamma component measured in the reactor cavity.
+        \item Consequently, the supplementary over-current protection circuitry—which relied heavily on these MOSFETs for \textcolor{sel}{SEL} mitigation—had to be entirely removed from the final DB6 design iteration.
+    \end{itemize}
+    \vspace{0.12cm}
+    \begin{center}
+        \includegraphics[width=1.0\linewidth]{assets/fig_mosfet_threshold.png}
+    \end{center}
+    \vspace{-0.2cm}
+    \captiontext{Threshold voltage shifts depicted in IV curves of irradiated FDFMA3N109 MOSFETs.}
+}
+
+\block{DB6 TID Performance}{
+    \tightitems
+        \item Point-of-load regulator currents and FPGA temperatures remained highly stable over the full $\sim$400\,Gy proton exposure at IFJ Krak\'ow and the 220\,Gy test at CERN CC60.
+    \end{itemize}
+    \vspace{0.12cm}
+    \begin{center}
+        \includegraphics[width=1.0\linewidth]{assets/fig_db6_tid_test.png}
+    \end{center}
+    \vspace{-0.2cm}
+    \captiontext{DB6 board currents and KU FPGA temperatures remained stable over the $\sim$400\,Gy \textcolor{tid}{TID} test.}
+}
+
+\block{DB6 NIEL Performance}{
+    \tightitems
+        \item DB6-0 was strongly irradiated at the TRIGA reactor up to the $14\times10^{12}$\,n$_\text{eq}$/cm$^2$ target.
+        \item The KU FPGAs showed excellent intrinsic tolerance without significant logic degradation.
+        \item The ProASIC and FLASH memory components exhibited minor, temporary reprogrammability after-effects, but recovered completely following standard thermal annealing.
+    \end{itemize}
+}
+
+% ===========================================================================
+\column{0.333}
+
+\block{Regulator Qualification Matrix}{
+    \looseitems
+        \item Maintaining stable, noise-free power delivery is an absolute priority. Both the LVPS bricks and the DB6 point-of-load (POL) conversion components were rigorously and systematically evaluated across multiple test facilities.
+    \end{itemize}
+    \vspace{0.3cm}
+    \begin{center}
+    \small
+    \begin{tabular}{p{0.3\linewidth} p{0.35\linewidth} p{0.18\linewidth}}
+    \hline\hline
+    \textbf{Regulator} & \textbf{Radiation Outcome} & \textbf{Status} \\
+    \hline
+    LTM4691 DC-DC & Testing scheduled 2025--2026 & \textcolor{tid}{Pending} \\
+    LT3080 LDO & Passed combined TID/SEE runs & \textcolor{niel}{Qualified} \\
+    DB6 POL Regs. & Output currents perfectly stable & \textcolor{niel}{Qualified} \\
+    \hline\hline
+    \end{tabular}
+    \end{center}
+}
+
+\block{LVPS Brick Optimization}{
+    \looseitems
+        \item The Low-Voltage Power Supply (LVPS) bricks are engineered to operate as efficient 300\,kHz two-switch forward converters, reducing the bulk 200\,V input down to a heavily regulated 10\,V output.
+        \item Strategic replacement of the STB57N65M5 MOSFET with the much superior \textbf{SIHFS9N60A} variant yielded a remarkable efficiency increase from $\sim$58\% to \textbf{$\sim$72\%}.
+    \end{itemize}
+    \vspace{0.12cm}
+    \begin{center}
+        \includegraphics[width=1.0\linewidth]{assets/fig_lvps_brick.pdf}
+    \end{center}
+    \vspace{-0.2cm}
+    \captiontext{Detailed LVPS brick topology and physical hardware implementation overview.}
+    \vspace{0.12cm}
+    \begin{center}
+        \includegraphics[width=1.0\linewidth]{assets/fig_diodes_tid_test.pdf}
+    \end{center}
+    \vspace{-0.2cm}
+    \captiontext{Diodes TID testing results showing minimal shifts.}
+}
+
+\block{Simplified LVPS Wiring Scheme}{
+    \looseitems
+        \item Long-distance control signals originating from the service cavern were halved from \textbf{18} directly down to \textbf{9} per module.
+        \item A novel tri-state logic scheme (on/off/hold) was implemented, significantly easing the complex cable routing and yielding a major reduction in the overall material budget.
+    \end{itemize}
+    \vspace{0.12cm}
+    \begin{center}
+        \includegraphics[width=1.0\linewidth]{assets/fig_wire_reduction.pdf}
+    \end{center}
+    \vspace{-0.2cm}
+    \captiontext{Diagram of the 18-to-9 control-wire reduction scheme designed for the LVPS.}
+}
+
+\block{LVPS Radiation Campaign}{
+    \looseitems
+        \item Critical components (LT1681, LTC6241, IR2110) passed TID/NIEL tests with minor shifts. System-level validation occurred at CERN CHARM.
+    \end{itemize}
+    \vspace{0.12cm}
+    \begin{center}
+        \includegraphics[width=1.0\linewidth]{assets/fig_lvps_tests_overview.pdf}
+    \end{center}
+    \vspace{-0.2cm}
+    \captiontext{Facilities and beam configurations for the LVPS campaign.}
+}
+
+\block{Conclusions \& Mass Production}{
+    \looseitems
+        \item The extensive and multi-layered testing campaign confirmed full HL-LHC compatibility for the vast majority of DB6 and LVPS electronic components.
+        \item Radiation testing results successfully informed critical and targeted design changes—such as the removal of problematic oscillators and MOSFETs—achieving optimal systemic reliability.
+        \item With qualifications nearly complete, approximately \textbf{930 DB6 units} will enter full-scale mass production starting in 2026.
+    \end{itemize}
+}
+
+\end{columns}
+\end{document}

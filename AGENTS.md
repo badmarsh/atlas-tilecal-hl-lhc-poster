@@ -135,6 +135,12 @@ The preview is ~849×1200 for a ~841×1189 mm page — a rounded card border vs.
 clip is a few pixels. We wrongly called it "fixed" twice by eye. **Measure**
 (`check_fit.py`) or crop-and-zoom the exact region (see §6) before concluding.
 
+### 3e. Paths to assets and logos
+Always use `assets/fig_name.png` and `logos/atlas_transparent.png`. Do NOT use relative paths like `../../assets/` or `../logos/`. You are building from the `build/` directory, where these folders are directly available.
+
+### 3f. Isolated Workspaces
+If you are running in an isolated subagent workspace, `sources/converted/` may not exist in your branch. Use absolute paths to read files from the parent workspace, or use standard read tools (`view_file`, `cat`) instead of directory listing tools inside the branched `sources/` folder.
+
 ---
 
 ## 4. Fixing overflow — reclaim vertical space in this order
@@ -148,14 +154,9 @@ with a comfortable margin (aim for WARN-free, i.e. lowest content < ~97.5% down)
 2. **Reduce inter-figure / pre-caption space.** `\vspace{0.12cm}` before a
    figure → `0.08cm` or `0cm`; make the post-figure `\vspace{-0.2cm}` more
    negative (`-0.3cm`).
-3. **Reduce `blockverticalspace`** in the `\documentclass[...]` options (affects
-   all columns; fine because col1/col3 have slack).
-4. **Shrink figures** via the `width=0.NN\linewidth` fraction — **last resort**,
-   because these are data plots that must stay readable. Shrink the *tallest*
-   figure first (largest height = width × (img_height/img_width); see ratios
-   below), not necessarily the biggest on screen.
-5. **Trim prose.** Only if the above isn't enough. Preserve the physics facts;
-   cut filler words, not numbers/units.
+3. **Trim prose.** Preserve the physics facts; cut filler words, not numbers/units.
+4. **Move content between columns or rows** to rebalance the layout.
+   *(Note: Do NOT change `blockverticalspace` to fix overflow, as top/bottom margins between cards are absolute. Do NOT shrink figures—images must ALWAYS be `1.0\linewidth`.)*
 
 ### Figure aspect ratios (height per unit width — who hogs vertical space)
 | Figure | px | height/width | Note |
@@ -168,11 +169,8 @@ with a comfortable margin (aim for WARN-free, i.e. lowest content < ~97.5% down)
 A wide-and-short figure costs little height even at large width; a near-square
 one costs a lot. Trim by **height impact**, not apparent size.
 
-### Known-good col2 figure widths (current PASS state — ≥0.90 design rule)
-All three col2 figures are set to `0.90\linewidth` in `newest-poster.tex`, with
-`\itemsep` `0.15em` in all three col2 blocks. If a content edit makes col2
-overflow again, tighten prose first (§4 steps 1–2) before reducing figure widths
-below 0.90.
+### Figure widths (1.0 design rule)
+Images must ALWAYS be set to `1.0\linewidth` to maximize readability. If a content edit makes col2 overflow, tighten prose first (§4 steps 1–2) or move content. Do not shrink figure widths below `1.0\linewidth`.
 
 ---
 
@@ -193,7 +191,7 @@ When the user asks to change what a card says:
    - Bullet lists use `\looseitems` (col1/col3) or `\tightitems` (col2),
      both defined in the preamble LAYOUT PARAMETERS section.
    - Each figure sits in a `\begin{center}...\end{center}` followed by
-     `\captiontext{caption text}`. Minimum figure width: `0.90\linewidth`.
+     `\captiontext{caption text}`. Image width must ALWAYS be `1.0\linewidth`.
 4. **Escape LaTeX specials in prose:** `%`→`\%`, `&`→`\&`, `_`→`\_`, `#`→`\#`,
    `$`→`\$`. Angle brackets need math mode: `<5\%` → `$<5\%$`, `≥` → `$\geq$`.
    These compile silently wrong otherwise (inverted `¿` glyphs).
@@ -224,9 +222,10 @@ running to the last pixel row with no margin.
 
 ## 7. House rules
 
-- **Edit only `build/irradiation_poster.tex`** for content/layout. Leave
+- **Edit only `.tex` files in `build/`** (like `build/drafts/<poster>.tex`) for content/layout. Leave
   `template/`, `sources/`, `pipeline/`, `venv/` untouched unless explicitly
   asked to re-run extraction.
+- **Do NOT redefine standard macros.** If copying a preamble, do not duplicate `\looseitems` or `\tightitems`. Ensure `\begin{document}` is included.
 - **`pdflatex` engine** (the poster uses `\documentclass{tikzposter}` + plain
   `graphicx`; no fontspec). Two passes. `build.sh` handles it.
 - **Keep the PDF closed in viewers while iterating** (see §3c).
@@ -274,9 +273,8 @@ material to understand what content and figures are available:
 2. List every figure file present in `build/assets/` and note its aspect
    ratio (px width × height). Figures are the visual anchor of each card —
    plan which figure belongs to which card before writing.
-3. Map content to the 3×3 grid (9 cards total). Aim for every card to be
-   approximately equally full — no card should be sparse while another
-   overflows.
+3. **The poster MUST be at least 90% covered vertically.** If a column is sparse and ends too high, you MUST make cards longer or add cards into additional rows. It does NOT have to be a symmetrical 3x3 grid (e.g., you can have 4 cards in col1, 3 in col2, 5 in col3) as long as the 90% vertical coverage threshold is met across all 3 columns.
+4. Include more graphs and tables. You are scientifically competent enough to choose card topics that are important and have fitting visual assets.
 
 Source files (read all that are relevant to the poster topic):
   sources\converted\Output_Eduardo_IEEE_NSS_MIC_RTSD_Poster-2\Eduardo_IEEE_NSS_MIC_RTSD_Poster-2_mapped.tex
@@ -300,16 +298,15 @@ User card specifications (fill in or leave blank):
 
 ## Step 3 — Write the poster
 
-Target layout: **3 columns × 3 rows = 9 cards**. Every card must be filled
-with real, substantive content. The poster must feel uniformly dense — no
-large blank areas inside cards or columns that end far above the page bottom.
+Target layout: **3 columns × 3+ rows = 9+ cards** (can be asymmetrical rows like 4x3x5). Every card must be filled
+with real, substantive content. The poster must feel uniformly dense and be **at least 90% covered**. Top and bottom margins between cards are absolute, so fill space by making cards longer or adding more cards, rather than inflating `blockverticalspace`.
 
 Column 1 (left) — has the most vertical slack, put longer blocks here:
   - Block: "<SECTION A>" — <what this block covers>
   - Block: "<SECTION B>" — <what this block covers>
   - Block: References
 
-Column 2 (middle) — overflows first; use \tightitems, keep figures ≥0.90\linewidth:
+Column 2 (middle) — overflows first; use \tightitems, keep figures at 1.0\linewidth:
   - Block: "<SECTION C>"
   - Block: "<SECTION D>"
   - Block: "<SECTION E>"
@@ -328,6 +325,7 @@ Column 3 (right):
   "this means that". Every sentence must add physical or technical information.
 - State results with units and uncertainties where known.
   Use thin spaces: `40\,MHz`, `108\,Gy`, `13\times10^{12}\,n_\text{eq}/cm^2`.
+- **Use Tables for Data:** Component test results, pass/fail matrices, and numerical parameter sets MUST be formatted as LaTeX tables (`\begin{tabular}`) to elevate the poster visually. Do not use bulleted lists for tabular data.
 
 ## Style rules (non-negotiable)
 
@@ -335,19 +333,20 @@ Column 3 (right):
 - Use \looseitems for col1/col3 bullets, \tightitems for col2 bullets.
 - Radiation-effect terms: \textcolor{tid}{TID}, \textcolor{niel}{NIEL},
   \textcolor{see}{SEE}, \textcolor{sel}{SEL}.
-- Figures: minimum width 0.90\linewidth. Use \captiontext{...} for all captions.
+- Figures: ALWAYS width 1.0\linewidth. Use \captiontext{...} for all captions.
+- Visual Anchors: You must aggressively utilize ALL relevant graphical assets in `build/assets/` to visually anchor columns. Do not produce walls of text.
+- Standard Spacing: Enforce a standard `blockverticalspace=3em` (or `4em` max) in `\documentclass`. Do not inflate this to mask a lack of content.
 - Only reference figures that physically exist in build/assets/.
 
 ## Completion criteria — do NOT stop until ALL of these are true
 
-1. `cd build && ./build.sh <FILENAME>.tex` prints `RESULT: PASS`.
-2. All 9 cards contain real content from the source files. Placeholder text
+1. `cd build && ./build.sh drafts/<FILENAME>.tex` prints `RESULT: PASS`.
+2. All cards contain real content from the source files. Placeholder text
    ("TBD", "insert here", "lorem ipsum", single-word bullets) is a failure
    condition, not a draft.
 3. Every card that has a matching figure in build/assets/ uses it with a
    \captiontext{} caption.
-4. No card is visibly sparse — if a column ends more than ~25% above the page
-   bottom, add content or increase blockverticalspace until the poster fills.
+4. No card is visibly sparse. **The entire poster MUST be at least 90% covered.** If a column ends high, make cards longer or add more cards into additional rows. Do NOT artificially increase `blockverticalspace` to fill the page; always use `blockverticalspace=4em` strictly.
 5. The poster reads as a self-contained scientific summary. A physicist
    unfamiliar with this specific work can learn the key results from the poster
    alone, without referring to the papers.

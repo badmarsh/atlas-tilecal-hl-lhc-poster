@@ -17,6 +17,9 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$HERE"
 TEX="${1:-irradiation_poster.tex}"
 BASE="${TEX%.tex}"
+FILENAME="$(basename "$TEX")"
+BASENAME="${FILENAME%.tex}"
+DIRNAME="$(dirname "$TEX")"
 PREVDIR="./_prev"
 
 echo ":: removing any stale/locked ${BASE}.pdf"
@@ -33,13 +36,19 @@ else
     echo ":: compiling via pdflatex (x2)"
     pdflatex -interaction=nonstopmode -halt-on-error "$TEX" >/dev/null
     pdflatex -interaction=nonstopmode -halt-on-error "$TEX" >/dev/null
+    
+    # If TEX was in a subdirectory, pdflatex outputs to current dir. Move them to DIRNAME.
+    if [ "$DIRNAME" != "." ]; then
+        mv "${BASENAME}".pdf "${BASENAME}".log "${BASENAME}".aux "${BASENAME}".out "$DIRNAME"/ 2>/dev/null || true
+    fi
+
     mkdir -p "$PREVDIR"
     # -scale-to 1200 => longest side 1200px => ~849x1200 for A0 portrait,
     # the resolution check_fit.py was calibrated against (though it is
     # resolution-independent anyway).
-    pdftoppm -png -scale-to 1200 "${BASE}.pdf" "${PREVDIR}/${BASE}"
+    pdftoppm -png -scale-to 1200 "${BASE}.pdf" "${PREVDIR}/${BASENAME}"
     # pdftoppm names files BASE-1.png already; normalise if it added padding.
-    [ -f "${PREVDIR}/${BASE}-1.png" ] || mv "${PREVDIR}/${BASE}"-*.png "${PREVDIR}/${BASE}-1.png" 2>/dev/null || true
+    [ -f "${PREVDIR}/${BASENAME}-1.png" ] || mv "${PREVDIR}/${BASENAME}"-*.png "${PREVDIR}/${BASENAME}-1.png" 2>/dev/null || true
 fi
 
 echo
@@ -54,4 +63,8 @@ elif [ -x "$VENV/bin/python" ]; then
 else
     PY="python3"
 fi
-"$PY" check_fit.py "${PREVDIR}/${BASE}-1.png"
+if [ -f "${DIRNAME}/${PREVDIR}/${BASENAME}-1.png" ]; then
+    "$PY" check_fit.py "${DIRNAME}/${PREVDIR}/${BASENAME}-1.png"
+else
+    "$PY" check_fit.py "${PREVDIR}/${BASENAME}-1.png"
+fi
