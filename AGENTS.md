@@ -231,3 +231,76 @@ running to the last pixel row with no margin.
   declare success on a green LaTeX compile alone.
 - Don't commit/regenerate `venv/`, `_prev/`, or LaTeX aux files — see
   `.gitignore`.
+
+---
+
+## 8. Creating a new poster version
+
+Use `build/new_poster.tex` as the annotated starting-point skeleton (it has
+`% TODO:` markers in every block). Copy it to a new name, fill in the content,
+then build with `./build.sh <name>.tex`.
+
+**Lesson learned**: a minimal "skeleton passes PASS" is not success. An agent
+that stops as soon as the layout compiles clean has done nothing useful — every
+block must contain real content drawn from the source files before the task is
+done.
+
+**Prompt template — paste this to any agent to commission a new poster:**
+
+```
+You are working in the ATLAS TileCal HL-LHC irradiation poster repository.
+Read AGENTS.md fully before touching anything. The build loop and overflow
+rules in that file are mandatory — do not skip them.
+
+## Your task
+
+Write a complete, content-rich A0 poster as `build/<FILENAME>.tex`.
+Title:       <POSTER TITLE>
+Author:      <NAME>, on behalf of the ATLAS Tile Calorimeter System
+Institution: <INSTITUTION>
+
+## Source material
+
+Read these files for factual content. Every number, component name, dose
+value, and test result must come from these sources — do not invent physics:
+
+  sources/converted/Output_ATL-TILECAL-SLIDE-2025-552/ATL-TILECAL-SLIDE-2025-552_mapped.tex
+  sources/converted/Output_paper_Valdes_Santurio_2023_J._Inst._18_C04011/paper_Valdes_Santurio_2023_J._Inst._18_C04011_mapped.tex
+  sources/converted/Output_paper_ATL-TILECAL-PROC-2022-017/paper_ATL-TILECAL-PROC-2022-017_mapped.tex
+
+(Add or remove source files to match your topic.)
+
+## Layout — 3 equal columns
+
+Column 1 (left) — has the most vertical slack, put longer blocks here:
+  - Block: "<SECTION A>" — <what this block covers>
+  - Block: "<SECTION B>" — <what this block covers>
+  - Block: References
+
+Column 2 (middle) — overflows first; use \tightitems, keep figures ≤0.60\linewidth:
+  - Block: "<SECTION C>"
+  - Block: "<SECTION D>"
+  - Block: "<SECTION E>"
+
+Column 3 (right):
+  - Block: "<SECTION F>"
+  - Block: "<SECTION G>"
+  - Block: Conclusions & Outlook
+
+## Style rules (non-negotiable)
+
+- Copy the preamble from build/new_poster.tex — do not invent a new one.
+- Use \looseitems for col1/col3 bullets, \tightitems for col2 bullets.
+- Radiation-effect terms: \textcolor{tid}{TID}, \textcolor{niel}{NIEL},
+  \textcolor{see}{SEE}, \textcolor{sel}{SEL}.
+- Units use thin spaces: 40\,MHz  108\,Gy  10^{12}\,n/cm^2.
+- Only reference figures that physically exist in build/assets/.
+
+## Completion criteria — do NOT stop until ALL of these are true
+
+1. `cd build && ./build.sh <FILENAME>.tex` prints `RESULT: PASS`.
+2. Every block contains real content from the source files above.
+   Placeholder text ("TBD", "insert here", "lorem ipsum", single-word
+   bullets) is a failure condition, not a draft.
+3. At least two figures from build/assets/ are used with captions.
+```
