@@ -17,15 +17,39 @@ and `check_fit.py` prints `PASS`. Run them once after cloning.
 
 ### 1. Install system dependencies
 
+**Debian/Ubuntu (including WSL)**
+
 ```bash
-# Debian/Ubuntu (including WSL)
 sudo apt-get update
 sudo apt-get install -y texlive-latex-extra texlive-science texlive-fonts-extra \
     poppler-utils python3 python3-pip imagemagick
 ```
 
-`texlive-latex-extra` provides `tikzposter`. `poppler-utils` provides `pdftoppm`
-(used by `build.sh` to render the PNG preview when the PAI
+**macOS (Homebrew)**
+
+```bash
+brew install --cask mactex-no-gui   # ~4 GB; provides pdflatex + tikzposter
+brew install poppler imagemagick python
+```
+
+`mactex-no-gui` installs the full MacTeX distribution without the GUI apps
+(`TeXShop`, etc.). If you already have a partial TeX Live install and want a
+lighter option, `brew install basictex` works too, but you'll need to add the
+missing packages manually:
+
+```bash
+sudo tlmgr update --self
+sudo tlmgr install tikzposter collection-latexextra collection-science \
+    collection-fontsrecommended
+```
+
+After either route, ensure `pdflatex` is on your PATH (open a new terminal or
+run `eval "$(/usr/libexec/path_helper)"` if it isn't).
+
+---
+
+`texlive-latex-extra` / MacTeX provides `tikzposter`. `poppler-utils` / `poppler`
+provides `pdftoppm` (used by `build.sh` to render the PNG preview when the PAI
 `latex-document-skill` is not present). `imagemagick` is optional — only needed
 for `convert` crop-and-zoom debugging (§6 of AGENTS.md).
 
